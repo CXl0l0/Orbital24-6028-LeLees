@@ -1,9 +1,10 @@
 import LoginID from "./LoginID";
+import test from "../images/urusai.png";
 
 function LoginForm() {
   return (
     <>
-      <h2>(insert logo here)</h2>
+      <img src={test} width={150}></img>
       <h3>Login</h3>
       <LoginID />
     </>
