@@ -1,7 +1,6 @@
-import { getElementError } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { click } from "@testing-library/user-event/dist/click";
 import { useState } from "react";
+import { MdDeviceUnknown } from "react-icons/md";
+import { RiLockPasswordFill } from "react-icons/ri";
 
 function showPassword() {
   let password = document.getElementById("passwordInput");
@@ -19,30 +18,43 @@ const LoginID = () => {
 
   return (
     <>
-      <div>
-        Device ID
-        <form>
+      <form>
+        <div>
+          Device ID <MdDeviceUnknown />
+        </div>
+        <div>
           <input
+            type="text"
+            placeholder="Enter Device ID"
             id="deviceIdForm"
             value={deviceID}
             onChange={(e) => setDeviceID(e.target.value)}
           ></input>
-        </form>
-      </div>
-      <div>
-        Password
-        <form>
+        </div>
+        <div>
+          Password <RiLockPasswordFill />
+        </div>
+        <div>
           <input
+            placeholder="Enter Password"
             id="passwordInput"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           ></input>
           <input type="checkbox" onClick={showPassword}></input> Show Password
-        </form>
-      </div>
+        </div>
+        <div>
+          <button type="submit">Login</button>
+        </div>
+      </form>
       <div>
-        <button>Login</button>
+        <p>
+          New Device?{" "}
+          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&pp=ygUIcmlja3JvbGw%3D">
+            Register
+          </a>
+        </p>
       </div>
     </>
   );
