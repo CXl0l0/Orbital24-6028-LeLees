@@ -7,6 +7,7 @@ import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import HeaderIcon from "../../HeaderIcon";
 import { auth } from "../../../firebase/firebase";
+import "./SignUpForm.css";
 
 const SignUpForm = () => {
   function showPassword() {
@@ -19,8 +20,10 @@ const SignUpForm = () => {
     }
   }
 
+  const [signedUp, isSignedUp] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [error, setError] = useState(null);
 
   const signUp = (e) => {
     e.preventDefault();
@@ -28,12 +31,20 @@ const SignUpForm = () => {
       .then((userCredential) => {
         console.log(userCredential);
       })
+      .then(() => {
+        isSignedUp(true);
+      })
       .catch((error) => {
         console.log(error);
+        setError(error);
       });
   };
 
-  return (
+  return signedUp ? (
+    <p>
+      You've created a new account! <a href="/">Login here</a>
+    </p>
+  ) : (
     <>
       <img src={logo} alt="urusai logo" width={150}></img>
       <h1>Sign Up</h1>
@@ -68,6 +79,11 @@ const SignUpForm = () => {
         </div>
 
         <button type="submit">Sign up</button>
+        {error && ( //might be other error, rmb to recode this section
+          <p className="signUpError">
+            The email provided is already registered!
+          </p>
+        )}
       </form>
       <div>
         <p>

@@ -1,7 +1,12 @@
 import React from "react";
+import AuthDetails from "../auth/AuthDetails";
 
 function Home() {
-  return <div>Welcome Home!</div>;
+  return (
+    <>
+      <AuthDetails />
+    </>
+  );
 }
 
 export default Home;

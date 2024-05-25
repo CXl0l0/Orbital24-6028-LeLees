@@ -9,6 +9,7 @@ import { FaRegEyeSlash } from "react-icons/fa";
 import HeaderIcon from "../../HeaderIcon";
 import { auth } from "../../../firebase/firebase";
 import { Navigate } from "react-router-dom";
+import "./LoginForm.css";
 
 function LoginForm() {
   function showPassword() {
@@ -24,6 +25,7 @@ function LoginForm() {
   const [userSignedIn, setUserSignedIn] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
 
   const signIn = (e) => {
     e.preventDefault();
@@ -34,6 +36,7 @@ function LoginForm() {
       .then(() => setUserSignedIn(true))
       .catch((error) => {
         console.log(error);
+        setError(error);
       });
   };
 
@@ -74,6 +77,9 @@ function LoginForm() {
         </div>
 
         <button type="submit">Login</button>
+        {error && (
+          <p className="loginFailed">Login failed, wrong email or password!</p>
+        )}
       </form>
       <div>
         <p>
