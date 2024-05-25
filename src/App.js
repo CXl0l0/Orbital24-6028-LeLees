@@ -1,6 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
-import LoginForm from "./components/LoginPage/LoginForm";
+import LoginForm from "./components/auth/LoginPage/LoginForm";
 
 function App() {
   return (
