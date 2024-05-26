@@ -1,4 +1,7 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+} from "firebase/auth";
 import logo from "../../images/urusai.png";
 import { useState } from "react";
 import { MdDeviceUnknown } from "react-icons/md";
@@ -20,7 +23,8 @@ const SignUpForm = () => {
     }
   }
 
-  const [signedUp, isSignedUp] = useState(false);
+  const [sendEmailVerificationLetter, setSendEmailVerificationLetter] =
+    useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState(null);
@@ -30,9 +34,9 @@ const SignUpForm = () => {
     createUserWithEmailAndPassword(auth, newEmail, newPassword)
       .then((userCredential) => {
         console.log(userCredential);
-      })
-      .then(() => {
-        isSignedUp(true);
+        sendEmailVerification(userCredential.user);
+        console.log("Email verification sent!");
+        setSendEmailVerificationLetter(true);
       })
       .catch((error) => {
         console.log(error);
@@ -40,9 +44,10 @@ const SignUpForm = () => {
       });
   };
 
-  return signedUp ? (
+  return sendEmailVerificationLetter ? (
     <p>
-      You've created a new account! <a href="/">Login here</a>
+      We've sent you an email verification! Please check your email to verify
+      your account. <a href="/">Login here</a>
     </p>
   ) : (
     <>

@@ -4,6 +4,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import React, { useEffect, useState } from "react";
 import { auth } from "../../firebase/firebase";
 import { useNavigate } from "react-router-dom";
+import LoginForm from "./LoginPage/LoginForm";
 
 const AuthDetails = () => {
   const [authUser, setAuthUser] = useState(null);
@@ -39,7 +40,7 @@ const AuthDetails = () => {
           <button onClick={userSignOut}>Sign out</button>
         </p>
       ) : (
-        <p>You are signed out</p>
+        <LoginForm />
       )}
     </div>
   );

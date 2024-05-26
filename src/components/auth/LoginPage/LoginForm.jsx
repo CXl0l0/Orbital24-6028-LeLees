@@ -22,6 +22,7 @@ function LoginForm() {
     }
   }
 
+  const [verified, setVerified] = useState(false);
   const [userSignedIn, setUserSignedIn] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,14 +34,20 @@ function LoginForm() {
       .then((userCredential) => {
         console.log(userCredential);
       })
-      .then(() => setUserSignedIn(true))
+      .then(() => {
+        setError(false);
+        setVerified(auth.currentUser.emailVerified);
+        console.log(auth.currentUser.email);
+        console.log(auth.currentUser.emailVerified);
+        setUserSignedIn(true);
+      })
       .catch((error) => {
         console.log(error);
         setError(error);
       });
   };
 
-  return userSignedIn ? (
+  return userSignedIn && verified ? (
     <Navigate to="/home" />
   ) : (
     <>
@@ -77,6 +84,12 @@ function LoginForm() {
         </div>
 
         <button type="submit">Login</button>
+        {!error && userSignedIn && !verified && (
+          <p className="userNotVerified">
+            Your account hasn't been verified yet, please verify it first. Check
+            you emails.
+          </p>
+        )}
         {error && (
           <p className="loginFailed">Login failed, wrong email or password!</p>
         )}
