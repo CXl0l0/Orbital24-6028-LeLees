@@ -2,10 +2,9 @@ import logo from "../../images/urusai.png";
 import "./LoginForm.css";
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { MdDeviceUnknown } from "react-icons/md";
+import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
-import { FaRegEye } from "react-icons/fa";
-import { FaRegEyeSlash } from "react-icons/fa";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import HeaderIcon from "../../HeaderIcon";
 import { auth } from "../../../firebase/firebase";
 import { Navigate } from "react-router-dom";
@@ -54,35 +53,29 @@ function LoginForm() {
       <img src={logo} alt="urusai logo" width={150}></img>
       <h1>Login</h1>
       <form onSubmit={signIn}>
-        <div>
-          Email <MdDeviceUnknown />
-        </div>
-        <div>
-          <input
-            type="email"
-            placeholder="Enter Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          ></input>
-        </div>
-
-        <div>
-          Password <RiLockPasswordFill />
-        </div>
-        <div>
-          <input
-            id="passwordInput"
-            placeholder="Enter Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          ></input>
-          <HeaderIcon
-            inactiveIcon={<FaRegEyeSlash onClick={showPassword} />}
-            activeIcon={<FaRegEye onClick={showPassword} />}
-          />
-        </div>
-
+        Email <MdEmail />
+        <br />
+        <input
+          type="email"
+          placeholder="Enter Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        ></input>
+        <br />
+        Password <RiLockPasswordFill />
+        <br />
+        <input
+          id="passwordInput"
+          placeholder="Enter Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        ></input>
+        <HeaderIcon
+          inactiveIcon={<FaRegEyeSlash onClick={showPassword} />}
+          activeIcon={<FaRegEye onClick={showPassword} />}
+        />
+        <br />
         <button type="submit">Login</button>
         {!error && userSignedIn && !verified && (
           <p className="userNotVerified">
@@ -95,9 +88,7 @@ function LoginForm() {
         )}
       </form>
       <div>
-        <p>
-          New Account? <a href="/register">Register</a>
-        </p>
+        New Account? <a href="/register">Register</a>
       </div>
     </>
   );

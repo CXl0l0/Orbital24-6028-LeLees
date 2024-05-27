@@ -1,13 +1,13 @@
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  updateProfile,
 } from "firebase/auth";
 import logo from "../../images/urusai.png";
 import { useState } from "react";
-import { MdDeviceUnknown } from "react-icons/md";
+import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
-import { FaRegEye } from "react-icons/fa";
-import { FaRegEyeSlash } from "react-icons/fa";
+import { FaUser, FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import HeaderIcon from "../../HeaderIcon";
 import { auth, db } from "../../../firebase/firebase";
 import { doc, setDoc } from "firebase/firestore";
@@ -27,6 +27,7 @@ const SignUpForm = () => {
   const [sendEmailVerificationLetter, setSendEmailVerificationLetter] =
     useState(false);
   const [showAlert, setShowAlert] = useState(null);
+  const [userName, setUserName] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordAgain, setNewPasswordAgain] = useState("");
@@ -42,17 +43,23 @@ const SignUpForm = () => {
       createUserWithEmailAndPassword(auth, newEmail, newPassword)
         .then((userCredential) => {
           console.log(userCredential);
-          sendEmailVerification(userCredential.user);
-          console.log("Email verification sent!");
-          setSendEmailVerificationLetter(true);
+          updateProfile(userCredential.user, {
+            displayName: userName,
+          });
           signedUpAs === "user"
             ? setDoc(doc(db, "users", userCredential.user.uid), {
+                name: userName,
                 role: signedUpAs,
               }).catch((e) => console.log(e))
             : setDoc(doc(db, "admins", userCredential.user.uid), {
+                name: userName,
                 id: adminId,
                 role: signedUpAs,
               }).catch((e) => console.log(e));
+
+          sendEmailVerification(userCredential.user);
+          console.log("Email verification sent!");
+          setSendEmailVerificationLetter(true);
         })
         .catch((error) => {
           console.log(error);
@@ -73,20 +80,28 @@ const SignUpForm = () => {
       <img src={logo} alt="urusai logo" width={150}></img>
       <h1>Sign Up</h1>
       <form onSubmit={signUp}>
-        Email <MdDeviceUnknown />
+        Username <FaUser />
         <br />
-        <div>
-          <input
-            type="email"
-            placeholder="Enter Email"
-            value={newEmail}
-            onChange={(e) => setNewEmail(e.target.value)}
-            required
-          ></input>
-        </div>
-        New Password <RiLockPasswordFill />
+        <input
+          type="text"
+          placeholder="Enter username"
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+          required
+        />
         <br />
+        Email <MdEmail />
+        <br />
+        <input
+          type="email"
+          placeholder="Enter Email"
+          value={newEmail}
+          onChange={(e) => setNewEmail(e.target.value)}
+          required
+        />
         <div>
+          New Password <RiLockPasswordFill />
+          <br />
           <input
             id="newPasswordInput"
             placeholder="Enter New Password"
@@ -94,7 +109,7 @@ const SignUpForm = () => {
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             required
-          ></input>
+          />
           <HeaderIcon
             inactiveIcon={
               <FaRegEyeSlash onClick={() => showPassword("newPasswordInput")} />
@@ -103,15 +118,14 @@ const SignUpForm = () => {
               <FaRegEye onClick={() => showPassword("newPasswordInput")} />
             }
           />
-        </div>
-        <div>
+          <br />
           <input
             id="newPasswordInputAgain"
             placeholder="Enter New Password Again"
             type="password"
             onChange={(e) => setNewPasswordAgain(e.target.value)}
             required
-          ></input>
+          />
           <HeaderIcon
             inactiveIcon={
               <FaRegEyeSlash
@@ -140,8 +154,7 @@ const SignUpForm = () => {
             onChange={(e) => setSignedUpAs(e.target.id)}
           />
           <label for="administration">Administration</label>
-        </div>
-        <div>
+          <br />
           {signedUpAs === "administration" && (
             <p>
               Enter Administration ID

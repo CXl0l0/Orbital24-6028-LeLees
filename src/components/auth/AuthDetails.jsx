@@ -36,7 +36,7 @@ const AuthDetails = () => {
     <div>
       {authUser ? (
         <p>
-          Welcome to urusai! {authUser.email} <br />
+          Welcome to urusai! {authUser.displayName || authUser.email} <br />
           <button onClick={userSignOut}>Sign out</button>
         </p>
       ) : (
