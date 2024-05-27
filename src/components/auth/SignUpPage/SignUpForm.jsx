@@ -62,7 +62,7 @@ const SignUpForm = () => {
   ) : (
     <>
       <img src={logo} alt="urusai logo" width={150}></img>
-      <h1>sign Up</h1>
+      <h1>Sign Up</h1>
       <form onSubmit={SignUp}>
         <div>
           Email <MdDeviceUnknown />
