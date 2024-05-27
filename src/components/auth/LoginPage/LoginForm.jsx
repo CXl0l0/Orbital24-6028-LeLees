@@ -60,6 +60,7 @@ function LoginForm() {
           placeholder="Enter Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         ></input>
         <br />
         Password <RiLockPasswordFill />
@@ -70,6 +71,7 @@ function LoginForm() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         ></input>
         <HeaderIcon
           inactiveIcon={<FaRegEyeSlash onClick={showPassword} />}
@@ -90,6 +92,8 @@ function LoginForm() {
       <div>
         New Account? <a href="/register">Register</a>
       </div>
+      <br />
+      <a href="/forgotpassword">Forgot password?</a>
     </>
   );
 }

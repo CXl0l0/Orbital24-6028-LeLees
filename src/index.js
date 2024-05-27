@@ -6,6 +6,7 @@ import Home from "./components/HomePage/Home";
 import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SignUpForm from "./components/auth/SignUpPage/SignUpForm";
+import ForgotPassword from "./components/auth/ForgotPasswordPage/ForgotPassword";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
   {
     path: "register",
     element: <SignUpForm />,
+  },
+  {
+    path: "forgotpassword",
+    element: <ForgotPassword />,
   },
 ]);
 
