@@ -3,13 +3,14 @@ import {
   sendEmailVerification,
 } from "firebase/auth";
 import logo from "../../images/urusai.png";
-import { setState, useState } from "react";
+import { useState } from "react";
 import { MdDeviceUnknown } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import HeaderIcon from "../../HeaderIcon";
-import { auth } from "../../../firebase/firebase";
+import { auth, db } from "../../../firebase/firebase";
+import { collection, addDoc } from "firebase/firestore";
 import "./SignUpForm.css";
 
 const SignUpForm = () => {
@@ -30,9 +31,10 @@ const SignUpForm = () => {
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordAgain, setNewPasswordAgain] = useState("");
   const [error, setError] = useState(null);
+  const [signedUpAs, setSignedUpAs] = useState("");
   let samePassword = false;
 
-  const SignUp = (e) => {
+  const signUp = (e) => {
     e.preventDefault();
     samePassword = newPasswordAgain === newPassword;
     if (samePassword) {
@@ -42,6 +44,9 @@ const SignUpForm = () => {
           sendEmailVerification(userCredential.user);
           console.log("Email verification sent!");
           setSendEmailVerificationLetter(true);
+          addDoc(collection(db, "users"), {
+            role: signedUpAs,
+          }).catch((e) => console.log(e));
         })
         .catch((error) => {
           console.log(error);
@@ -63,10 +68,9 @@ const SignUpForm = () => {
     <>
       <img src={logo} alt="urusai logo" width={150}></img>
       <h1>Sign Up</h1>
-      <form onSubmit={SignUp}>
-        <div>
-          Email <MdDeviceUnknown />
-        </div>
+      <form onSubmit={signUp}>
+        Email <MdDeviceUnknown />
+        <br />
         <div>
           <input
             type="email"
@@ -76,9 +80,8 @@ const SignUpForm = () => {
             required
           ></input>
         </div>
-        <div>
-          New Password <RiLockPasswordFill />
-        </div>
+        New Password <RiLockPasswordFill />
+        <br />
         <div>
           <input
             id="newPasswordInput"
@@ -115,6 +118,40 @@ const SignUpForm = () => {
               <FaRegEye onClick={() => showPassword("newPasswordInputAgain")} />
             }
           />
+        </div>
+        <div>
+          <p>Signing up as:</p>
+          <input
+            type="radio"
+            id="user"
+            name="role"
+            onChange={(e) => setSignedUpAs(e.target.id)}
+            required
+          />
+          <label for="user">User</label>
+          <input
+            type="radio"
+            id="administration"
+            name="role"
+            onChange={(e) => setSignedUpAs(e.target.id)}
+          />
+          <label for="administration">Administration</label>
+        </div>
+        <div>
+          {signedUpAs === "administration" && (
+            <p>
+              Enter Administration ID
+              <br />
+              {
+                <input
+                  id="administrationID"
+                  placeholder="Enter Administration ID"
+                  type="text"
+                  required
+                ></input>
+              }
+            </p>
+          )}
         </div>
         <button type="submit">Sign up</button>
         <br />
