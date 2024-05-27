@@ -10,7 +10,7 @@ import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import HeaderIcon from "../../HeaderIcon";
 import { auth, db } from "../../../firebase/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import "./SignUpForm.css";
 
 const SignUpForm = () => {
@@ -32,6 +32,7 @@ const SignUpForm = () => {
   const [newPasswordAgain, setNewPasswordAgain] = useState("");
   const [error, setError] = useState(null);
   const [signedUpAs, setSignedUpAs] = useState("");
+  const [adminId, setAdminId] = useState("");
   let samePassword = false;
 
   const signUp = (e) => {
@@ -44,18 +45,21 @@ const SignUpForm = () => {
           sendEmailVerification(userCredential.user);
           console.log("Email verification sent!");
           setSendEmailVerificationLetter(true);
-          addDoc(collection(db, "users"), {
-            role: signedUpAs,
-          }).catch((e) => console.log(e));
+          signedUpAs === "user"
+            ? setDoc(doc(db, "users", userCredential.user.uid), {
+                role: signedUpAs,
+              }).catch((e) => console.log(e))
+            : setDoc(doc(db, "admins", userCredential.user.uid), {
+                id: adminId,
+                role: signedUpAs,
+              }).catch((e) => console.log(e));
         })
         .catch((error) => {
           console.log(error);
           setError(error);
         });
     } else {
-      setShowAlert(
-        "Please ensure that you had entered the same password again."
-      );
+      setShowAlert("Please ensure that you had entered the same password.");
     }
   };
 
@@ -147,6 +151,7 @@ const SignUpForm = () => {
                   id="administrationID"
                   placeholder="Enter Administration ID"
                   type="text"
+                  onChange={(e) => setAdminId(e.target.value)}
                   required
                 ></input>
               }
