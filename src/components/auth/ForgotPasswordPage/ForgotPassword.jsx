@@ -3,6 +3,7 @@ import "./ForgotPassword.css";
 import React, { useState } from "react";
 import { auth } from "../../../firebase/firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
+import { MdEmail } from "react-icons/md";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
@@ -28,11 +29,11 @@ const ForgotPassword = () => {
       <h1>Reset your password</h1>
       <h4>Enter your email to reset your password</h4>
       <form onSubmit={handleResetPassword}>
-        Email
+        Email <MdEmail />
         <br />
         <input
           type="email"
-          placeholder="Enter your Email"
+          placeholder="Enter Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required

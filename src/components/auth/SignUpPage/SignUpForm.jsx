@@ -10,7 +10,7 @@ import { RiLockPasswordFill } from "react-icons/ri";
 import { FaUser, FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import HeaderIcon from "../../HeaderIcon";
 import { auth, db } from "../../../firebase/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import "./SignUpForm.css";
 
 const SignUpForm = () => {
@@ -33,38 +33,80 @@ const SignUpForm = () => {
   const [newPasswordAgain, setNewPasswordAgain] = useState("");
   const [error, setError] = useState(null);
   const [signedUpAs, setSignedUpAs] = useState("");
+  const [adminName, setAdminName] = useState("");
   const [adminId, setAdminId] = useState("");
   let samePassword = false;
 
   const signUp = (e) => {
     e.preventDefault();
+    setShowAlert("");
+    setError(false);
     samePassword = newPasswordAgain === newPassword;
     if (samePassword) {
-      createUserWithEmailAndPassword(auth, newEmail, newPassword)
-        .then((userCredential) => {
-          console.log(userCredential);
-          updateProfile(userCredential.user, {
-            displayName: userName,
+      if (signedUpAs === "user") {
+        //if signed up as user
+        //Create new account straight away
+        createUserWithEmailAndPassword(auth, newEmail, newPassword)
+          .then((userCredential) => {
+            console.log(userCredential);
+            updateProfile(userCredential.user, {
+              displayName: userName,
+            });
+            //Add new document for user
+            setDoc(doc(db, "users", userCredential.user.uid), {
+              username: userName,
+              role: signedUpAs,
+            }).catch((e) => console.log(e));
+            //Finally, send email verification
+            sendEmailVerification(userCredential.user);
+            console.log("Email verification sent!");
+            setSendEmailVerificationLetter(true);
+          })
+          .catch((error) => {
+            //in case error thrown when creating acc
+            console.log(error);
+            setError(error);
           });
-          signedUpAs === "user"
-            ? setDoc(doc(db, "users", userCredential.user.uid), {
-                name: userName,
-                role: signedUpAs,
-              }).catch((e) => console.log(e))
-            : setDoc(doc(db, "admins", userCredential.user.uid), {
-                name: userName,
-                id: adminId,
-                role: signedUpAs,
-              }).catch((e) => console.log(e));
+      } else if (signedUpAs === "administration") {
+        //if signed up as admin, check administration id
+        const adminRef = doc(db, "adminids", adminName);
+        getDoc(adminRef).then((adminSnap) => {
+          if (adminSnap.exists()) {
+            const dbid = adminSnap.data().id;
+            console.log(dbid);
+            dbid === adminId
+              ? createUserWithEmailAndPassword(auth, newEmail, newPassword)
+                  .then((userCredential) => {
+                    console.log(userCredential);
+                    updateProfile(userCredential.user, {
+                      displayName: userName,
+                    });
+                    setDoc(doc(db, "admins", userCredential.user.uid), {
+                      username: userName,
+                      id: adminId,
+                      role: signedUpAs,
+                    }).catch((e) => console.log(e));
 
-          sendEmailVerification(userCredential.user);
-          console.log("Email verification sent!");
-          setSendEmailVerificationLetter(true);
-        })
-        .catch((error) => {
-          console.log(error);
-          setError(error);
+                    sendEmailVerification(userCredential.user);
+                    console.log("Email verification sent!");
+                    setSendEmailVerificationLetter(true);
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                    setError(error);
+                  })
+              : console.log("incorrect admin id entered");
+            setShowAlert(
+              "Please ensure you've entered the correct administrataion ID."
+            );
+          } else {
+            console.log("No admin with entered adminName found in db");
+            setShowAlert(
+              "Please ensure you've entered the correct administration name."
+            );
+          }
         });
+      }
     } else {
       setShowAlert("Please ensure that you had entered the same password.");
     }
@@ -84,7 +126,7 @@ const SignUpForm = () => {
         <br />
         <input
           type="text"
-          placeholder="Enter username"
+          placeholder="Enter Your Username"
           value={userName}
           onChange={(e) => setUserName(e.target.value)}
           required
@@ -157,17 +199,25 @@ const SignUpForm = () => {
           <br />
           {signedUpAs === "administration" && (
             <p>
+              Enter Administration Name
+              <br />
+              <input
+                id="administrationName"
+                placeholder="Enter Administration Name"
+                type="text"
+                onChange={(e) => setAdminName(e.target.value)}
+                required
+              ></input>
+              <br />
               Enter Administration ID
               <br />
-              {
-                <input
-                  id="administrationID"
-                  placeholder="Enter Administration ID"
-                  type="text"
-                  onChange={(e) => setAdminId(e.target.value)}
-                  required
-                ></input>
-              }
+              <input
+                id="administrationID"
+                placeholder="Enter Administration ID"
+                type="text"
+                onChange={(e) => setAdminId(e.target.value)}
+                required
+              ></input>
             </p>
           )}
         </div>
