@@ -112,133 +112,155 @@ const SignUpForm = () => {
         });
       }
     } else {
-      setShowAlert("Please ensure that you had entered the same password.");
+      setShowAlert("Please ensure that you have entered the same password.");
     }
   };
 
   return sendEmailVerificationLetter ? (
-    <p>
+    <p className="emailLetter">
       We've sent you an email verification! Please check your email to verify
-      your account. <a href="/">Login here</a>
+      your account.
+      <div>
+        <a href="/">Login here</a>
+      </div>
     </p>
   ) : (
     <>
-      <img src={logo} alt="urusai logo" width={150}></img>
-      <h1>Sign Up</h1>
-      <form onSubmit={signUp}>
-        Username <FaUser />
-        <br />
-        <input
-          type="text"
-          placeholder="Enter Your Username"
-          value={userName}
-          onChange={(e) => setUserName(e.target.value)}
-          required
-        />
-        <br />
-        Email <MdEmail />
-        <br />
-        <input
-          type="email"
-          placeholder="Enter Email"
-          value={newEmail}
-          onChange={(e) => setNewEmail(e.target.value)}
-          required
-        />
-        <div>
-          New Password <RiLockPasswordFill />
-          <br />
-          <input
-            id="newPasswordInput"
-            placeholder="Enter New Password"
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-          />
-          <HeaderIcon
-            inactiveIcon={
-              <FaRegEyeSlash onClick={() => showPassword("newPasswordInput")} />
-            }
-            activeIcon={
-              <FaRegEye onClick={() => showPassword("newPasswordInput")} />
-            }
-          />
-          <br />
-          <input
-            id="newPasswordInputAgain"
-            placeholder="Enter New Password Again"
-            type="password"
-            onChange={(e) => setNewPasswordAgain(e.target.value)}
-            required
-          />
-          <HeaderIcon
-            inactiveIcon={
-              <FaRegEyeSlash
-                onClick={() => showPassword("newPasswordInputAgain")}
+      <body className="signupBody">
+        <img className="logo" src={logo} alt="urusai logo" width={300}></img>
+        <div className="signup-wrapper">
+          <h1>Sign Up</h1>
+          <form onSubmit={signUp}>
+            <div className="signup-input-box">
+              Username <FaUser />
+              <br />
+              <input
+                type="text"
+                placeholder="Enter Your Username"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                required
               />
-            }
-            activeIcon={
-              <FaRegEye onClick={() => showPassword("newPasswordInputAgain")} />
-            }
-          />
-        </div>
-        <div>
-          <p>Signing up as:</p>
-          <input
-            type="radio"
-            id="user"
-            name="role"
-            onChange={(e) => setSignedUpAs(e.target.id)}
-            required
-          />
-          <label for="user">User</label>
-          <input
-            type="radio"
-            id="administration"
-            name="role"
-            onChange={(e) => setSignedUpAs(e.target.id)}
-          />
-          <label for="administration">Administration</label>
-          <br />
-          {signedUpAs === "administration" && (
+              <br />
+              Email <MdEmail />
+              <br />
+              <input
+                type="email"
+                placeholder="Enter Email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                required
+              />
+              <div>
+                New Password <RiLockPasswordFill />
+                <br />
+                <input
+                  id="newPasswordInput"
+                  placeholder="Enter New Password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                />
+                <i>
+                  <HeaderIcon
+                    inactiveIcon={
+                      <FaRegEyeSlash
+                        onClick={() => showPassword("newPasswordInput")}
+                      />
+                    }
+                    activeIcon={
+                      <FaRegEye
+                        onClick={() => showPassword("newPasswordInput")}
+                      />
+                    }
+                  />
+                </i>
+                <input
+                  id="newPasswordInputAgain"
+                  placeholder="Enter New Password Again"
+                  type="password"
+                  onChange={(e) => setNewPasswordAgain(e.target.value)}
+                  required
+                />
+                <i>
+                  <HeaderIcon
+                    inactiveIcon={
+                      <FaRegEyeSlash
+                        onClick={() => showPassword("newPasswordInputAgain")}
+                      />
+                    }
+                    activeIcon={
+                      <FaRegEye
+                        onClick={() => showPassword("newPasswordInputAgain")}
+                      />
+                    }
+                  />
+                </i>
+              </div>
+              <div className="signupAs">
+                <p>Signing up as:</p>
+                <input
+                  type="radio"
+                  id="user"
+                  name="role"
+                  onChange={(e) => setSignedUpAs(e.target.id)}
+                  required
+                />
+                <label for="user">User</label>
+                <input
+                  type="radio"
+                  id="administration"
+                  name="role"
+                  onChange={(e) => setSignedUpAs(e.target.id)}
+                />
+                <label for="administration">Administration</label>
+                {signedUpAs === "administration" && (
+                  <div className="signup-administration">
+                    <p>
+                      Enter Administration Name
+                      <br />
+                      <input
+                        id="administrationName"
+                        placeholder="Enter Administration Name"
+                        type="text"
+                        onChange={(e) => setAdminName(e.target.value)}
+                        required
+                      ></input>
+                      <br />
+                      Enter Administration ID
+                      <br />
+                      <input
+                        id="administrationID"
+                        placeholder="Enter Administration ID"
+                        type="text"
+                        onChange={(e) => setAdminId(e.target.value)}
+                        required
+                      ></input>
+                    </p>
+                  </div>
+                )}
+              </div>
+              <button type="submit">Sign up</button>
+              <br />
+              <p className="showAlert">{showAlert}</p>
+              {error && ( //might be other error, rmb to recode this section
+                <p className="signUpError">
+                  The email provided is already registered as an account.
+                </p>
+              )}
+            </div>
+          </form>
+          <div>
             <p>
-              Enter Administration Name
-              <br />
-              <input
-                id="administrationName"
-                placeholder="Enter Administration Name"
-                type="text"
-                onChange={(e) => setAdminName(e.target.value)}
-                required
-              ></input>
-              <br />
-              Enter Administration ID
-              <br />
-              <input
-                id="administrationID"
-                placeholder="Enter Administration ID"
-                type="text"
-                onChange={(e) => setAdminId(e.target.value)}
-                required
-              ></input>
+              Already have an account?{" "}
+              <a className="signup-login" href="/">
+                Login
+              </a>
             </p>
-          )}
+          </div>
         </div>
-        <button type="submit">Sign up</button>
-        <br />
-        {showAlert}
-        {error && ( //might be other error, rmb to recode this section
-          <p className="signUpError">
-            The email provided is already registered as an account.
-          </p>
-        )}
-      </form>
-      <div>
-        <p>
-          Already have an account? <a href="/">Login</a>
-        </p>
-      </div>
+      </body>
     </>
   );
 };

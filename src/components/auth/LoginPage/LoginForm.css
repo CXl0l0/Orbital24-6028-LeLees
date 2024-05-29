@@ -16,23 +16,32 @@
   justify-content: center;
   min-height: 100vh;
   align-items: center;
-  background-color: rgba(140, 0, 255, 0.61);
+  background-image: linear-gradient(
+    to bottom right,
+    rgba(140, 0, 255, 0.61),
+    rgb(247, 126, 12)
+  );
 }
 .logo {
-  position: absolute;
-  top: 100px;
+  position: relative;
 }
 .wrapper {
   margin-top: 50px;
-  min-height: 350px;
+  min-height: 370px;
   min-width: 430px;
-  background-color: rgba(249, 252, 104, 0.979);
+  box-shadow: 0 0 3px black;
+  background-image: linear-gradient(to bottom right, violet, orange);
   text-align: center;
   border-radius: 50px;
   backdrop-filter: blur(30px);
 }
+.wrapper h1 {
+  margin-top: 20px;
+}
 .wrapper button {
-  width: 50%;
+  margin-top: 15px;
+  margin-left: 5px;
+  width: 60%;
   height: 30px;
   background: white;
   border: none;
@@ -40,6 +49,8 @@
   border-radius: 30px;
   box-shadow: 0 0 3px black;
   cursor: pointer;
+  font-size: medium;
+  font-weight: bold;
 }
 .input-box {
   left: 75px;
@@ -52,6 +63,7 @@
   padding: 10px;
   border: 1px solid black;
   border-radius: 10px;
+  font-size: 15px;
   color: black;
   outline: none;
   background: transparent;
@@ -62,15 +74,26 @@
 .input-box i {
   position: absolute;
   left: 260px;
-  bottom: 3px;
+  bottom: 30px;
 }
 .input-box icon {
+  position: absolute;
+}
+.input-box span {
   position: absolute;
 }
 .loginFailed {
   color: crimson;
   font-size: small;
+  font-weight: bold;
 }
 .forgotPassword {
   font-size: small;
+  margin-right: 165px;
+  color: rgb(95, 93, 93);
+  font-weight: 600;
+}
+.register {
+  color: blue;
+  font-weight: 600;
 }

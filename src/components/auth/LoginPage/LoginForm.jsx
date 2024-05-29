@@ -9,6 +9,7 @@ import HeaderIcon from "../../HeaderIcon";
 import { auth } from "../../../firebase/firebase";
 import { Navigate } from "react-router-dom";
 import "./LoginForm.css";
+import React from "react";
 
 function LoginForm() {
   function showPassword() {
@@ -57,25 +58,28 @@ function LoginForm() {
           <br />
           <form onSubmit={signIn}>
             <div className="input-box">
-              Email <MdEmail className="icon" />
+              <span>
+                Email <MdEmail className="icon" />
+              </span>
               <br />
               <input
                 type="email"
-                placeholder="Enter Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter Your Email"
                 required
               ></input>
               <br />
-              <br />
-              Password <RiLockPasswordFill className="icon" />
+              <span>
+                Password <RiLockPasswordFill className="icon" />
+              </span>
               <br />
               <input
                 id="passwordInput"
-                placeholder="Enter Password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter Your Password"
                 required
               ></input>
               <i>
@@ -85,24 +89,25 @@ function LoginForm() {
                 />
               </i>
             </div>
-            <br />
-            <button type="submit">Login</button> <br />
             <a className="forgotPassword" href="/forgotpassword">
               Forgot password?
             </a>
+            <br />
+            <button type="submit">Login</button> <br />
             {!error && userSignedIn && !verified && (
               <p className="userNotVerified">
                 Your account hasn't been verified yet, please verify it first.
                 Check you emails.
               </p>
             )}
-            {error && (
-              <p className="loginFailed">
-                Login failed, wrong email or password!
-              </p>
-            )}
           </form>
-          Don't have an account? <a href="/register">Register</a>
+          {error && (
+            <p className="loginFailed">Login failed, please try again.</p>
+          )}
+          Don't have an account?{" "}
+          <a className="register" href="/register">
+            Register
+          </a>
         </div>
       </body>
     </>
