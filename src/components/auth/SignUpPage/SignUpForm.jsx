@@ -4,7 +4,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import logo from "../../images/urusai.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FaUser, FaRegEye, FaRegEyeSlash } from "react-icons/fa";
@@ -14,6 +14,10 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import "./SignUpForm.css";
 
 const SignUpForm = () => {
+  useEffect(() => {
+    document.title = "Sign Up urusai!";
+  });
+
   const showPassword = (id) => {
     let password = document.getElementById(id);
 

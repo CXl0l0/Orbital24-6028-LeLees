@@ -50,50 +50,61 @@ function LoginForm() {
     <Navigate to="/home" />
   ) : (
     <>
-      <img src={logo} alt="urusai logo" width={150}></img>
-      <h1>Login</h1>
-      <form onSubmit={signIn}>
-        Email <MdEmail />
-        <br />
-        <input
-          type="email"
-          placeholder="Enter Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        ></input>
-        <br />
-        Password <RiLockPasswordFill />
-        <br />
-        <input
-          id="passwordInput"
-          placeholder="Enter Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        ></input>
-        <HeaderIcon
-          inactiveIcon={<FaRegEyeSlash onClick={showPassword} />}
-          activeIcon={<FaRegEye onClick={showPassword} />}
-        />
-        <br />
-        <button type="submit">Login</button>
-        {!error && userSignedIn && !verified && (
-          <p className="userNotVerified">
-            Your account hasn't been verified yet, please verify it first. Check
-            you emails.
-          </p>
-        )}
-        {error && (
-          <p className="loginFailed">Login failed, wrong email or password!</p>
-        )}
-      </form>
-      <div>
-        New Account? <a href="/register">Register</a>
-      </div>
-      <br />
-      <a href="/forgotpassword">Forgot password?</a>
+      <body className="loginBody">
+        <img className="logo" src={logo} alt="urusai logo" width={300}></img>
+        <div className="wrapper">
+          <h1>Login</h1>
+          <br />
+          <form onSubmit={signIn}>
+            <div className="input-box">
+              Email <MdEmail className="icon" />
+              <br />
+              <input
+                type="email"
+                placeholder="Enter Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              ></input>
+              <br />
+              <br />
+              Password <RiLockPasswordFill className="icon" />
+              <br />
+              <input
+                id="passwordInput"
+                placeholder="Enter Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              ></input>
+              <i>
+                <HeaderIcon
+                  inactiveIcon={<FaRegEyeSlash onClick={showPassword} />}
+                  activeIcon={<FaRegEye onClick={showPassword} />}
+                />
+              </i>
+            </div>
+            <br />
+            <button type="submit">Login</button> <br />
+            <a className="forgotPassword" href="/forgotpassword">
+              Forgot password?
+            </a>
+            {!error && userSignedIn && !verified && (
+              <p className="userNotVerified">
+                Your account hasn't been verified yet, please verify it first.
+                Check you emails.
+              </p>
+            )}
+            {error && (
+              <p className="loginFailed">
+                Login failed, wrong email or password!
+              </p>
+            )}
+          </form>
+          Don't have an account? <a href="/register">Register</a>
+        </div>
+      </body>
     </>
   );
 }

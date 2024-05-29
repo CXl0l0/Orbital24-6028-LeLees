@@ -1,4 +1,76 @@
+@import url("https://fonts.googleapis.com/css2?family=Poetsen+One&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.loginBody {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  align-items: center;
+  background-color: rgba(140, 0, 255, 0.61);
+}
+.logo {
+  position: absolute;
+  top: 100px;
+}
+.wrapper {
+  margin-top: 50px;
+  min-height: 350px;
+  min-width: 430px;
+  background-color: rgba(249, 252, 104, 0.979);
+  text-align: center;
+  border-radius: 50px;
+  backdrop-filter: blur(30px);
+}
+.wrapper button {
+  width: 50%;
+  height: 30px;
+  background: white;
+  border: none;
+  outline: none;
+  border-radius: 30px;
+  box-shadow: 0 0 3px black;
+  cursor: pointer;
+}
+.input-box {
+  left: 75px;
+  position: relative;
+  width: 190px;
+  text-align: left;
+}
+.input-box input {
+  width: 150%;
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 10px;
+  color: black;
+  outline: none;
+  background: transparent;
+}
+.input-box input::placeholder {
+  color: black;
+}
+.input-box i {
+  position: absolute;
+  left: 260px;
+  bottom: 3px;
+}
+.input-box icon {
+  position: absolute;
+}
 .loginFailed {
   color: crimson;
+  font-size: small;
+}
+.forgotPassword {
   font-size: small;
 }
