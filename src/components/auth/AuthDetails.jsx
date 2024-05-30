@@ -32,6 +32,9 @@ const AuthDetails = () => {
       .then(() => navigate("/"));
   }
 
+  return authUser;
+
+  /*
   return (
     <div>
       {authUser ? (
@@ -44,6 +47,7 @@ const AuthDetails = () => {
       )}
     </div>
   );
+  */
 };
 
 export default AuthDetails;

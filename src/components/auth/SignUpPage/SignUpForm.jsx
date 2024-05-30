@@ -57,7 +57,7 @@ const SignUpForm = () => {
               displayName: userName,
             });
             //Add new document for user
-            setDoc(doc(db, "users", userCredential.user.uid), {
+            setDoc(doc(db, "accounts", userCredential.user.uid), {
               username: userName,
               role: signedUpAs,
             }).catch((e) => console.log(e));
@@ -85,7 +85,7 @@ const SignUpForm = () => {
                     updateProfile(userCredential.user, {
                       displayName: userName,
                     });
-                    setDoc(doc(db, "admins", userCredential.user.uid), {
+                    setDoc(doc(db, "accounts", userCredential.user.uid), {
                       username: userName,
                       id: adminId,
                       role: signedUpAs,
