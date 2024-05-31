@@ -59,7 +59,7 @@ void connectAWS() {
     Serial.print("Subscribing to ");
     Serial.print(subscribe_topic);
     Serial.println(" ...");
-    while (!client.subscribe(subscribe_topic)) {   // Subscribe to messages to the specified topic at a QoS of 1 (QoS 1: Receive once or more)
+    while (!client.subscribe(subscribe_topic)) {   // Subscribe to messages to the specified topic.
         Serial.println("...");                       // The function returns true: subscription succeeded, false: subscription failed / connection lost / message is too large
         delay(500);
     }
@@ -69,7 +69,7 @@ void connectAWS() {
 }
 
 void publishMessage() {
-    JsonDocument docP;    // Creates an empty (null) JSON document called 'doc' and store it in the allocated memory pool. (The estimated maximum number of bytes of each line of {"Sound value":sound} is 24)
+    JsonDocument docP;    // Creates an empty (null) JSON document called 'docP' and store it in the heap. (The estimated maximum number of bytes of each line of {"Sound value":sound} is 24)
     // In Version 6 of the ArduinoJson library, you can specify whether you want StaticJsonDocument or DynamicJsonDocument. 
         // StaticJsonDocument: A static JSON document is used to store the JSON document in a stack rather than in a heap ('DynamicJsonDocument'). You must specify the size of the static JSON document which will be allocated at compile time (when the program is turned into machine code). It is faster, more reliable, more predictable and suitable for documents with a known small size (< 1 KB).
         // DynamicJsonDocument: A dynamic JSON document is used to store the JSON document in a heap rather than in a stack ('StaticJsonDocument'). The memory is allocated flexibly during runtime (when the program is actually running). It is more flexible and convenient when the size of the JSON data is large or can vary significantly, though it is usually slower and riskier of memory errors.
@@ -84,9 +84,9 @@ void publishMessage() {
                     // It takes one argument, which is a pointer to the memory block you want to deallocate. The pointer must have been previously returned by a successful memory allocation function like malloc.
                     // free prevents memory leaks which occur when you allocate memory but don't release it, causing your program to consume more and more memory over time.
     // In Version 7 (latest version as of 28/5/2024), StaticJsonDocument no longer exists and DynamicJsonDocument is renamed to JsonDocument (the one used here).
-    docP["Sound value"] = sound;    // 'doc' now contains {"Sound value":sound}
+    docP["Sound value"] = sound;    // 'docP' now contains {"Sound value":sound}
     char JSONbuffer[50];
-    int n = serializeJson(docP, JSONbuffer);   // To serialise (convert) a JSON object or array ('doc') into a JSON-encoded string (no spaces, line break, etc.), which can be more easily transmitted or stored, and stores (writes) it to a specified output ('char' buffer, 'String' object, a stream, etc.), in this case, it's the 'char' buffer 'JSONbuffer'.
+    int n = serializeJson(docP, JSONbuffer);   // To serialise (convert) a JSON object or array ('docP') into a JSON-encoded string (no spaces, line break, etc.), which can be more easily transmitted or stored, and stores (writes) it to a specified output ('char' buffer, 'String' object, a stream, etc.), in this case, it's the 'char' buffer 'JSONbuffer'.
     // The function returns the number of bytes written.
     client.publish(publish_topic, JSONbuffer);
     // Serial.print("n = ");
@@ -112,7 +112,7 @@ void loop() {
     // https://pubsubclient.knolleary.net/api#connected
 
     if (!client.loop()){    // 'loop' allows the client (ESP32) to process incoming messages and maintain its connection to the server (AWS IoT Core).
-        connectAWS();       // Reuturns true: the client is connected; or false: the client is not connected)
+        connectAWS();       // Returns true: the client is connected; or false: the client is not connected)
     }                       // If the client is not connected, attempts to connect again.
 
     sound = analogRead(AO);
