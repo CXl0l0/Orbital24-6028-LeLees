@@ -77,32 +77,33 @@ const SignUpForm = () => {
         getDoc(adminRef).then((adminSnap) => {
           if (adminSnap.exists()) {
             const dbid = adminSnap.data().id;
-            console.log(dbid);
-            dbid === adminId
-              ? createUserWithEmailAndPassword(auth, newEmail, newPassword)
-                  .then((userCredential) => {
-                    console.log(userCredential);
-                    updateProfile(userCredential.user, {
-                      displayName: userName,
-                    });
-                    setDoc(doc(db, "accounts", userCredential.user.uid), {
-                      username: userName,
-                      id: adminId,
-                      role: signedUpAs,
-                    }).catch((e) => console.log(e));
+            if (dbid === adminId) {
+              createUserWithEmailAndPassword(auth, newEmail, newPassword)
+                .then((userCredential) => {
+                  console.log(userCredential);
+                  updateProfile(userCredential.user, {
+                    displayName: userName,
+                  });
+                  setDoc(doc(db, "accounts", userCredential.user.uid), {
+                    username: userName,
+                    id: adminId,
+                    role: signedUpAs,
+                  }).catch((e) => console.log(e));
 
-                    sendEmailVerification(userCredential.user);
-                    console.log("Email verification sent!");
-                    setSendEmailVerificationLetter(true);
-                  })
-                  .catch((error) => {
-                    console.log(error);
-                    setError(error);
-                  })
-              : console.log("incorrect admin id entered");
-            setShowAlert(
-              "Please ensure you've entered the correct administrataion ID."
-            );
+                  sendEmailVerification(userCredential.user);
+                  console.log("Email verification sent!");
+                  setSendEmailVerificationLetter(true);
+                })
+                .catch((error) => {
+                  console.log(error);
+                  setError(error);
+                });
+            } else {
+              console.log("Incorrect admin id entered");
+              setShowAlert(
+                "Please ensure you've entered the correct administrataion ID."
+              );
+            }
           } else {
             console.log("No admin with entered adminName found in db");
             setShowAlert(
@@ -246,7 +247,7 @@ const SignUpForm = () => {
               <p className="showAlert">{showAlert}</p>
               {error && ( //might be other error, rmb to recode this section
                 <p className="signUpError">
-                  The email provided is already registered as an account.
+                  Error creating account, please enter your information again.
                 </p>
               )}
             </div>

@@ -112,6 +112,7 @@
   font-weight: bold;
   font-size: small;
   position: relative;
+  width: 300px;
 }
 .showAlert {
   color: crimson;

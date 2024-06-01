@@ -97,3 +97,8 @@
   color: blue;
   font-weight: 600;
 }
+.userNotVerified {
+  color: crimson;
+  font-weight: bold;
+  font-size: small;
+}

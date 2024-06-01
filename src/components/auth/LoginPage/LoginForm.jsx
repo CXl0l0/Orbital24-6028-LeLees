@@ -95,10 +95,7 @@ function LoginForm() {
             <br />
             <button type="submit">Login</button> <br />
             {!error && userSignedIn && !verified && (
-              <p className="userNotVerified">
-                Your account hasn't been verified yet, please verify it first.
-                Check you emails.
-              </p>
+              <p className="userNotVerified">Please verify your email first.</p>
             )}
           </form>
           {error && (

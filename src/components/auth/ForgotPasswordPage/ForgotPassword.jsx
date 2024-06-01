@@ -12,20 +12,23 @@ const ForgotPassword = () => {
 
   const [email, setEmail] = useState("");
   const [sentResetPassword, setSentResetPassword] = useState(false);
+  const [error, setError] = useState(false);
   const handleResetPassword = (e) => {
     e.preventDefault();
     sendPasswordResetEmail(auth, email)
       .then(() => {
         setSentResetPassword(true);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(error);
+        setError(true);
+      });
   };
 
   return sentResetPassword ? (
     <>
       <div className="sentResetPassword">
-        <p>We've sent a reset password email to you!</p>
-        <br />
+        <p>We've sent a reset password email to you! </p>
         <a href="/">Login</a>
       </div>
     </>
@@ -49,6 +52,12 @@ const ForgotPassword = () => {
               ></input>
               <br />
               <button type="submit">Reset password</button>
+              <br />
+              {error && (
+                <p className="reset-password-error">
+                  Please enter a valid email.
+                </p>
+              )}
             </div>
           </form>
           <br />
