@@ -38,17 +38,23 @@ export const AdminHome = () => {
       client.on("reconnect", () => {
         console.log("MQTT Client Reconnecting");
       });
-      client.on("message", function (topic, payload) {
-        setPayload(payload);
+      client.on("message", (topic, payload) => {
+        setPayload(topic + ": " + payload);
         console.log(payload.toString());
       });
     }
   }, [client]);
 
   function handleConnect() {
-    console.log("Connecting...");
-    setStatus("Connecting...");
-    setClient(mqtt.connect("ws://broker.emqx.io:8083/mqtt"));
+    if (status === "Disconnected") {
+      console.log("Connecting...");
+      setStatus("Connecting...");
+      setClient(
+        mqtt.connect(
+          "ws://a3fh404lk71g2d-ats.iot.ap-southeast-1.amazonaws.com/mqtt"
+        )
+      );
+    }
   }
 
   function handleDisconnect() {
@@ -62,10 +68,10 @@ export const AdminHome = () => {
   }
 
   function handleSubscribe() {
-    if (status === "Connected") {
+    if (status === "Connected" || status === "Subscribed") {
       client.subscribe("urusai1234");
       console.log("Successfully subscribed to urusai1234");
-      setPayload("Subscribed, awaiting message...");
+      setStatus("Subscribed");
     } else {
       setStatus("Error, please connect first");
       setTimeout(() => {

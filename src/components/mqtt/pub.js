@@ -6,6 +6,6 @@ client.on("connect", function () {
   setInterval(() => {
     var random = Math.random() * 50;
     console.log(random);
-    client.publish("urusai1234", random.toString() + ".");
+    client.publish("urusai1234", random.toString());
   }, 1000);
 });
