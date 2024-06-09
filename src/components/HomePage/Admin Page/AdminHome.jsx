@@ -50,11 +50,7 @@ export const AdminHome = () => {
     if (status === "Disconnected") {
       console.log("Connecting...");
       setStatus("Connecting...");
-      setClient(
-        mqtt.connect(
-          "ws://a3fh404lk71g2d-ats.iot.ap-southeast-1.amazonaws.com/mqtt"
-        )
-      );
+      setClient(mqtt.connect("ws://broker.emqx.io:8083/mqtt"));
     }
   }
 
