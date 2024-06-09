@@ -50,7 +50,7 @@ export const AdminHome = () => {
     if (status === "Disconnected") {
       console.log("Connecting...");
       setStatus("Connecting...");
-      setClient(mqtt.connect("ws://broker.emqx.io:8083/mqtt"));
+      setClient(mqtt.connect("https://broker.emqx.io:8083/mqtt"));
     }
   }
 
