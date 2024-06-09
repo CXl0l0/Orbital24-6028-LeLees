@@ -11,9 +11,6 @@ import logo from "../../images/urusai.png";
 import mqtt from "mqtt";
 
 export const AdminHome = () => {
-  const clientId = "emqx_react_" + Math.random().toString(16).substring(2, 8);
-  const username = "emqx_test";
-  const password = "emqx_test";
   const navigate = useNavigate();
   function userSignOut() {
     signOut(auth)
@@ -53,13 +50,7 @@ export const AdminHome = () => {
     if (status === "Disconnected") {
       console.log("Connecting...");
       setStatus("Connecting...");
-      setClient(
-        mqtt.connect("wss://broker.emqx.io:8084/mqtt", {
-          clientId,
-          username,
-          password,
-        })
-      );
+      setClient(mqtt.connect("wss://broker.emqx.io:8084/mqtt"));
     }
   }
 
