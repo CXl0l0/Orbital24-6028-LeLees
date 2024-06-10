@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include <WiFiClientSecure.h>    // An extension of the 'WiFiClient" library which supports SSL/TLS connections.
 #include <WiFiMulti.h> 
-#include <ArduinoJson.h>    // A popular library for working with JSON on Arduino.
-#include <PubSubClient.h>     // Essential library for MQTT communication on Arduino platforms.
+#include <ArduinoJson.h>    // A popular library for working with JSON on Arduino: https://arduinojson.org/v7/api/
+#include <PubSubClient.h>     // Essential library for MQTT communication on Arduino platforms: https://pubsubclient.knolleary.net/api
 #include <credentials.h>
 
 WiFiMulti wifi;
@@ -11,8 +11,8 @@ PubSubClient client(net);
 // This means that all MQTT communication by 'client' is done over a secure TLS connection through 'net'.
 
 #define AO 36
-#define publish_topic "esp32/publish"
-#define subscribe_topic "esp32/subscribe"
+#define publish_topic "topic_1"
+#define subscribe_topic "topic_2"
 int sound;
 
 void connectWiFi() {
@@ -32,7 +32,7 @@ void subscribeMessage(const char* topic, byte* payload, unsigned int length){   
     Serial.print("Subscription message from ");
     Serial.println(topic);
     
-    const char* message = docS["message"];
+    const char* message = docS["test_data"];
     Serial.println(message);
 }
 
@@ -76,7 +76,7 @@ void publishMessage() {
     // The function returns the number of bytes written.
     client.publish(publish_topic, JSONbuffer);
     // Serial.print("n = ");
-    // Serial.println(n);    // From here, we can know that the number of bytes written into JSONbuffer, i.e., the size of the JSON-encoded string is 18 bytes. This allows us to allocate a better size to the JSONbuffer 'char' array. (50 is safe)
+    // Serial.println(n);    // From here, we can know that the number of bytes written into JSONbuffer, i.e., the size of the JSON-encoded string is 20 bytes. This allows us to allocate a better size to the JSONbuffer 'char' array. (50 is safe)
 }
 
 void setup() {

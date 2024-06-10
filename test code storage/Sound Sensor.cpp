@@ -63,10 +63,11 @@ void loop() {
         // * is placed before 'Min' and 'Max' to dereference the iterators and return the actual minimum and maximum values.
             // Dereferencing an iterator means accessing the value pointed to by the iterator.
 
-    Serial.println(buffer);    // After storing your formatted string into your buffer, you can finally serial print it out.
-
-    Serial.print("n = ");
-    Serial.println(n);    // 'n', as explained above, should be the length of the formatted string, which should be 18 if the 'Max' and 'Min' values are 3-digit
+    Serial.print(buffer);    // After storing your formatted string into your buffer, you can finally serial print it out.
+    Serial.print(' ');
+    Serial.println(*Max - *Min);
+    // Serial.print("n = ");
+    // Serial.println(n);    // 'n', as explained above, should be the length of the formatted string, which should be 18 if the 'Max' and 'Min' values are 3-digit
 
     float average = float(sum) / float(arraySize);   // Float division, '/' alone, without the three 'float's is floor division.
     Serial.print("Average = ");
