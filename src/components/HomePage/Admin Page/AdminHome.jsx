@@ -19,7 +19,9 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import Grid from "@mui/material/Unstable_Grid2";
 import ConnectDevice from "../../mqtt/ConnectDevice";
+import AddDeviceCard from "./AddDeviceCard";
 
 export const AdminHome = () => {
   //For navigating to other pages
@@ -100,22 +102,40 @@ export const AdminHome = () => {
           )
         )
       ) : (
-        <center>
-          <h2>Welcome to the home page, {auth.currentUser.displayName}!</h2>
-          <h4>Start by adding some devices</h4>
-          <Box sx={{ "& > button": { m: 1 } }}>
-            <Button variant="contained" onClick={() => setAddDevice(true)}>
-              + Add Device
-            </Button>
-            <Button variant="contained" onClick={() => setAddDevice(false)}>
-              - Remove Device
-            </Button>
+        <div>
+          <center>
+            <h2>Welcome to the home page, {auth.currentUser.displayName}!</h2>
+            <h4>Start by adding some devices</h4>
+            <Box sx={{ "& > button": { m: 1 } }}>
+              <Button variant="contained" onClick={() => setAddDevice(true)}>
+                + Add Device
+              </Button>
+              <Button variant="contained" onClick={() => setAddDevice(false)}>
+                - Remove Device
+              </Button>
+            </Box>
+            {
+              //Add device section
+              addDevice && <ConnectDevice />
+            }
+          </center>
+          <Box>
+            <Grid container padding={4} spacing={4}>
+              <Grid xs={6} md={3}>
+                <AddDeviceCard />
+              </Grid>
+              <Grid xs={6} md={3}>
+                <AddDeviceCard />
+              </Grid>
+              <Grid xs={6} md={3}>
+                <AddDeviceCard />
+              </Grid>
+              <Grid xs={6} md={3}>
+                <AddDeviceCard />
+              </Grid>
+            </Grid>
           </Box>
-          {
-            //Add device section
-            addDevice && <ConnectDevice />
-          }
-        </center>
+        </div>
       )}
     </>
   );

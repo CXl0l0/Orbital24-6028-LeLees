@@ -11,10 +11,16 @@ const AccountPage = (prop) => {
   const authUser = auth.currentUser;
   const userRef = doc(db, "accounts", authUser.uid);
   const [userDoc, setUserDoc] = useState(null);
+  const [role, setRole] = useState("");
+  const [id, setID] = useState("");
+
   useEffect(() => {
     getDoc(userRef).then((userSnap) => {
       if (userSnap.exists()) {
-        setUserDoc(userSnap.data());
+        const userData = userSnap.data();
+        setUserDoc(userData);
+        setRole(userData.role);
+        setID(userData.id);
       } else {
         console.log("User doesnt exist in database");
       }
@@ -35,13 +41,13 @@ const AccountPage = (prop) => {
       </Box>
 
       <div className="account-overview">
-        Name: {authUser.displayName}
+        Username: {authUser.displayName}
         <br />
         Email: {authUser.email}
         <br />
-        Access Role: {userDoc.role}
+        Access Role: {role}
         <br />
-        ID: {userDoc.id}
+        ID: {id}
       </div>
     </>
   );

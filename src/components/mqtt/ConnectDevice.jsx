@@ -134,7 +134,7 @@ const ConnectDevice = () => {
             </Button>
           ) : status === "Subscribed" ? (
             <Button variant="outlined" onClick={handleSubscribe}>
-              Subscribed
+              Unubscribe
             </Button>
           ) : (
             <Button variant="contained" onClick={handleSubscribe} disabled>
