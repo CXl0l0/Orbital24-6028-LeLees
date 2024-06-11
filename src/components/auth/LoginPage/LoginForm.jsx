@@ -5,7 +5,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import HeaderIcon from "../../HeaderIcon";
+import HeaderIcon from "../HeaderIcon";
 import { auth } from "../../../firebase/firebase";
 import { Navigate } from "react-router-dom";
 import "./LoginForm.css";
@@ -84,8 +84,9 @@ function LoginForm() {
               ></input>
               <i>
                 <HeaderIcon
-                  inactiveIcon={<FaRegEyeSlash onClick={showPassword} />}
-                  activeIcon={<FaRegEye onClick={showPassword} />}
+                  doThis={showPassword}
+                  inactiveIcon={<FaRegEyeSlash />}
+                  activeIcon={<FaRegEye />}
                 />
               </i>
             </div>

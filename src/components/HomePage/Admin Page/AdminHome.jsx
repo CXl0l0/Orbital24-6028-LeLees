@@ -11,10 +11,9 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import mqtt from "mqtt";
 import logo from "../../images/urusai.png";
-import SettingsPage from "./SettingsPage";
-import AccountPage from "./AccountPage";
+import SettingsPage from "../SettingsPage";
+import AccountPage from "../AccountPage";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -34,72 +33,11 @@ export const AdminHome = () => {
       .then(() => navigate("/"));
   }
 
-  //Mqtt configurations
-  const [client, setClient] = useState(null);
-  const [payload, setPayload] = useState("");
-  const [status, setStatus] = useState("Disconnected");
-
-  useEffect(() => {
-    if (client) {
-      console.log(client);
-      client.on("connect", () => {
-        console.log("Succesfully connected to public broker EMQX");
-        setStatus("Connected");
-      });
-      client.on("error", (err) => {
-        console.log("Connection error: ", err);
-        client.end();
-        setStatus("Disconnected");
-      });
-      client.on("reconnect", () => {
-        console.log("MQTT Client Reconnecting");
-      });
-      client.on("message", (topic, payload) => {
-        setPayload(topic + ": " + payload);
-        console.log(payload.toString());
-      });
-    }
-  }, [client]);
-
-  function handleConnect() {
-    if (status === "Disconnected") {
-      console.log("Connecting...");
-      setStatus("Connecting...");
-      setClient(mqtt.connect("wss://broker.emqx.io:8084/mqtt"));
-    }
-  }
-
-  function handleDisconnect() {
-    if (client) {
-      setStatus("Disconnecting...");
-      client.end(() => {
-        console.log("Disconnected");
-        setStatus("Disconnected");
-      });
-    }
-  }
-
-  function handleSubscribe() {
-    if (status === "Connected" || status === "Subscribed") {
-      client.subscribe("urusai1234");
-      console.log("Successfully subscribed to urusai1234");
-      setStatus("Subscribed");
-    } else {
-      setStatus("Error, please connect first");
-      setTimeout(() => {
-        setStatus("Disconnected");
-      }, 2000);
-    }
-  }
-
-  //End of Mqtt configuration
-
   //Start of admin homepage logic components
   const [signingOut, setSigningOut] = useState(false);
   const [overlayPage, setOverlayPage] = useState("");
   const [addDevice, setAddDevice] = useState(false);
-
-  //End dof admin homepage logic components
+  //End of admin homepage logic components
 
   return (
     <>
@@ -124,6 +62,9 @@ export const AdminHome = () => {
             <IconButton aria-label="logout" onClick={() => setSigningOut(true)}>
               <IoLogInOutline size={30} />
             </IconButton>
+            {
+              //Sign out dialog
+            }
             <Dialog
               open={signingOut}
               onClose={() => setSigningOut(false)}
@@ -144,6 +85,9 @@ export const AdminHome = () => {
                 </Button>
               </DialogActions>
             </Dialog>
+            {
+              //End of sign out dialog
+            }
           </Toolbar>
         </AppBar>
       </Box>
@@ -158,15 +102,19 @@ export const AdminHome = () => {
       ) : (
         <center>
           <h2>Welcome to the home page, {auth.currentUser.displayName}!</h2>
-          <Button variant="contained" onClick={() => setAddDevice(true)}>
-            Add Device
-          </Button>
-          <Button variant="contained" onClick={() => setAddDevice(false)}>
-            Delete Device
-          </Button>
-          <br />
-          <br />
-          {addDevice && <ConnectDevice />}
+          <h4>Start by adding some devices</h4>
+          <Box sx={{ "& > button": { m: 1 } }}>
+            <Button variant="contained" onClick={() => setAddDevice(true)}>
+              + Add Device
+            </Button>
+            <Button variant="contained" onClick={() => setAddDevice(false)}>
+              - Remove Device
+            </Button>
+          </Box>
+          {
+            //Add device section
+            addDevice && <ConnectDevice />
+          }
         </center>
       )}
     </>

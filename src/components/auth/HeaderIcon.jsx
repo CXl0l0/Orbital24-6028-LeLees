@@ -1,13 +1,18 @@
 import React from "react";
 import { useState } from "react";
 
-function HeaderIcon({ inactiveIcon, activeIcon }) {
+function HeaderIcon({ inactiveIcon, activeIcon, doThis }) {
   const [isActive, setIsActive] = useState(false);
 
   return (
-    <span onClick={() => setIsActive(!isActive)}>
+    <i
+      onClick={() => {
+        setIsActive(!isActive);
+        doThis();
+      }}
+    >
       {isActive ? activeIcon : inactiveIcon}
-    </span>
+    </i>
   );
 }
 

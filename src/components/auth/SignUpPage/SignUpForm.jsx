@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FaUser, FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import HeaderIcon from "../../HeaderIcon";
+import HeaderIcon from "../HeaderIcon";
 import { auth, db } from "../../../firebase/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import "./SignUpForm.css";
@@ -165,16 +165,9 @@ const SignUpForm = () => {
                 />
                 <i>
                   <HeaderIcon
-                    inactiveIcon={
-                      <FaRegEyeSlash
-                        onClick={() => showPassword("newPasswordInput")}
-                      />
-                    }
-                    activeIcon={
-                      <FaRegEye
-                        onClick={() => showPassword("newPasswordInput")}
-                      />
-                    }
+                    doThis={() => showPassword("newPasswordInput")}
+                    inactiveIcon={<FaRegEyeSlash />}
+                    activeIcon={<FaRegEye />}
                   />
                 </i>
                 <input
@@ -186,16 +179,9 @@ const SignUpForm = () => {
                 />
                 <i>
                   <HeaderIcon
-                    inactiveIcon={
-                      <FaRegEyeSlash
-                        onClick={() => showPassword("newPasswordInputAgain")}
-                      />
-                    }
-                    activeIcon={
-                      <FaRegEye
-                        onClick={() => showPassword("newPasswordInputAgain")}
-                      />
-                    }
+                    doThis={() => showPassword("newPasswordInputAgain")}
+                    inactiveIcon={<FaRegEyeSlash />}
+                    activeIcon={<FaRegEye />}
                   />
                 </i>
               </div>
