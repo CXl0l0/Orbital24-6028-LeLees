@@ -20,8 +20,11 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Grid from "@mui/material/Unstable_Grid2";
+import TextField from "@mui/material/TextField";
 import ConnectDevice from "../../mqtt/ConnectDevice";
-import AddDeviceCard from "./AddDeviceCard";
+import DeviceCard from "./DeviceCard";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "../../../firebase/firebase";
 
 export const AdminHome = () => {
   //For navigating to other pages
@@ -37,8 +40,53 @@ export const AdminHome = () => {
 
   //Start of admin homepage logic components
   const [signingOut, setSigningOut] = useState(false);
+  const [showDevice, setShowDevice] = useState(false);
+  const [addingDevice, setAddingDevice] = useState(false);
+  const [invalidRoomNumber, setInvalidRoomNumber] = useState(false);
   const [overlayPage, setOverlayPage] = useState("");
-  const [addDevice, setAddDevice] = useState(false);
+  const [devices, setDevices] = useState([]);
+
+  function handleRemoveDevice(e) {
+    e.preventDefault();
+    const index = devices.length - 1;
+    setDevices([...devices.slice(0, index)]);
+  }
+
+  useEffect(() => {
+    //Prevent textfield from showing error
+    //when adding device again
+    setInvalidRoomNumber(false);
+  }, [addingDevice]);
+
+  function handleAddDevice(e) {
+    e.preventDefault();
+    const roomNum = document.getElementById("room-number").value;
+    const deviceRef = doc(db, "devices", roomNum.toString());
+    console.log("Entered room number: " + roomNum);
+    if (!isNaN(+roomNum)) {
+      //valid input (is number)
+      getDoc(deviceRef).then((deviceSnap) => {
+        if (deviceSnap.exists()) {
+          setAddingDevice(false);
+          setDevices([
+            ...devices,
+            <DeviceCard
+              deviceName={deviceSnap.data().deviceName}
+              roomNumber={roomNum}
+            />,
+          ]);
+        } else {
+          //invalid input
+          console.log("Invalid Room Number");
+          setInvalidRoomNumber(true);
+        }
+      });
+    } else {
+      //invalid input
+      console.log("Invalid Room Number");
+      setInvalidRoomNumber(true);
+    }
+  }
   //End of admin homepage logic components
 
   return (
@@ -107,32 +155,86 @@ export const AdminHome = () => {
             <h2>Welcome to the home page, {auth.currentUser.displayName}!</h2>
             <h4>Start by adding some devices</h4>
             <Box sx={{ "& > button": { m: 1 } }}>
-              <Button variant="contained" onClick={() => setAddDevice(true)}>
-                + Add Device
+              <Button variant="contained" onClick={() => setShowDevice(true)}>
+                Show Device
               </Button>
-              <Button variant="contained" onClick={() => setAddDevice(false)}>
-                - Remove Device
+              <Button variant="contained" onClick={() => setShowDevice(false)}>
+                Unshow Device
               </Button>
             </Box>
             {
               //Add device section
-              addDevice && <ConnectDevice />
+              showDevice && <ConnectDevice />
             }
+            <Box sx={{ "& > button": { m: 1 } }}>
+              <Button variant="outlined" onClick={handleRemoveDevice}>
+                - Remove Device
+              </Button>
+            </Box>
+            <h3>Your Devices</h3>
           </center>
           <Box>
-            <Grid container padding={4} spacing={4}>
-              <Grid xs={6} md={3}>
-                <AddDeviceCard />
-              </Grid>
-              <Grid xs={6} md={3}>
-                <AddDeviceCard />
-              </Grid>
-              <Grid xs={6} md={3}>
-                <AddDeviceCard />
-              </Grid>
-              <Grid xs={6} md={3}>
-                <AddDeviceCard />
-              </Grid>
+            <Grid container padding={4} spacing={6}>
+              {devices.map((device) => {
+                return (
+                  <Grid item xs={6} md={3}>
+                    {device}
+                  </Grid>
+                );
+              })}
+              <Button variant="outlined" onClick={() => setAddingDevice(true)}>
+                + Add Device
+              </Button>
+              {
+                //Adding Device's dialog
+                <Dialog
+                  open={addingDevice}
+                  onClose={() => setAddingDevice(false)}
+                  aria-labelledby="add-device-title"
+                  aria-describedby="add-device-description"
+                >
+                  <DialogTitle>Adding a device...</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      Please enter your room number.
+                    </DialogContentText>
+                    {invalidRoomNumber ? ( //entered invalid room number
+                      <TextField
+                        autoFocus
+                        error
+                        required
+                        margin="dense"
+                        label="Room Number"
+                        type="text"
+                        fullWidth
+                        variant="filled"
+                        id="room-number"
+                        helperText="Invalid room number"
+                      />
+                    ) : (
+                      <TextField
+                        autoFocus
+                        required
+                        margin="dense"
+                        label="Room Number"
+                        type="text"
+                        fullWidth
+                        variant="filled"
+                        id="room-number"
+                      />
+                    )}
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={() => setAddingDevice(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" onClick={handleAddDevice}>
+                      Add
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+                //End of Adding Device's dialog
+              }
             </Grid>
           </Box>
         </div>

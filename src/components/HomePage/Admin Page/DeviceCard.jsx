@@ -6,7 +6,7 @@ import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
-const AddDeviceCard = () => {
+const DeviceCard = (prop) => {
   return (
     <Card variant="outlined">
       <CardContent>
@@ -14,10 +14,10 @@ const AddDeviceCard = () => {
           Sound Sensor
         </Typography>
         <Typography variant="h5" component="div">
-          ESP32
+          {prop.deviceName}
         </Typography>
         <Typography sx={{ mb: 1.5 }} color="text.secondary">
-          Room #001
+          Room #{prop.roomNumber}
         </Typography>
       </CardContent>
       <CardActions>
@@ -27,4 +27,4 @@ const AddDeviceCard = () => {
   );
 };
 
-export default AddDeviceCard;
+export default DeviceCard;
