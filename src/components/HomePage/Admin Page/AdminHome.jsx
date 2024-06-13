@@ -21,10 +21,18 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Grid from "@mui/material/Unstable_Grid2";
 import TextField from "@mui/material/TextField";
+import Slide from "@mui/material/Slide";
+import CloseIcon from "@mui/icons-material/Close";
 import ConnectDevice from "../../mqtt/ConnectDevice";
 import DeviceCard from "./DeviceCard";
 import { getDoc, doc } from "firebase/firestore";
 import { db } from "../../../firebase/firebase";
+
+//Taken from material UI "Full-screen dialogs" section under
+//https://mui.com/material-ui/react-dialog/
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export const AdminHome = () => {
   //For navigating to other pages
@@ -43,13 +51,29 @@ export const AdminHome = () => {
   const [showDevice, setShowDevice] = useState(false);
   const [addingDevice, setAddingDevice] = useState(false);
   const [invalidRoomNumber, setInvalidRoomNumber] = useState(false);
+  const [deviceBoard, setDeviceBoard] = useState(false);
   const [overlayPage, setOverlayPage] = useState("");
   const [devices, setDevices] = useState([]);
+
+  useEffect(() => {
+    const devicesInStorage = JSON.parse(localStorage.getItem("devices"));
+    if (devicesInStorage) {
+      setDevices(devicesInStorage);
+    }
+  }, []);
 
   function handleRemoveDevice(e) {
     e.preventDefault();
     const index = devices.length - 1;
     setDevices([...devices.slice(0, index)]);
+  }
+
+  function handleRemoveDevice2(name) {
+    setDevices(
+      devices.filter((device) => {
+        return device.deviceName !== name;
+      })
+    );
   }
 
   useEffect(() => {
@@ -61,9 +85,9 @@ export const AdminHome = () => {
   function handleAddDevice(e) {
     e.preventDefault();
     const roomNum = document.getElementById("room-number").value;
-    const deviceRef = doc(db, "devices", roomNum.toString());
     console.log("Entered room number: " + roomNum);
-    if (!isNaN(+roomNum)) {
+    if (!isNaN(+roomNum) && roomNum !== "") {
+      const deviceRef = doc(db, "devices", roomNum.toString());
       //valid input (is number)
       getDoc(deviceRef).then((deviceSnap) => {
         if (deviceSnap.exists()) {
@@ -71,6 +95,10 @@ export const AdminHome = () => {
           setDevices([
             ...devices,
             <DeviceCard
+              viewDevice={handleViewDevice}
+              removeDevice={() =>
+                handleRemoveDevice2(deviceSnap.data().deviceName)
+              }
               deviceName={deviceSnap.data().deviceName}
               roomNumber={roomNum}
             />,
@@ -87,6 +115,15 @@ export const AdminHome = () => {
       setInvalidRoomNumber(true);
     }
   }
+
+  function handleViewDevice() {
+    setDeviceBoard(true);
+  }
+
+  function handleCloseDevice() {
+    setDeviceBoard(false);
+  }
+
   //End of admin homepage logic components
 
   return (
@@ -237,6 +274,42 @@ export const AdminHome = () => {
               }
             </Grid>
           </Box>
+
+          {
+            //Start of Device Board's dialog
+            <Dialog
+              fullScreen
+              open={deviceBoard}
+              onClose={handleCloseDevice}
+              TransitionComponent={Transition}
+            >
+              <AppBar sx={{ position: "relative" }}>
+                <Toolbar>
+                  <IconButton
+                    edge="start"
+                    color="inherit"
+                    onClick={handleCloseDevice}
+                    aria-label="close"
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                  <Typography
+                    sx={{ ml: 2, flex: 1 }}
+                    variant="h6"
+                    component="div"
+                  >
+                    Device
+                  </Typography>
+                </Toolbar>
+              </AppBar>
+              <DialogContent>
+                <center>
+                  <ConnectDevice />
+                </center>
+              </DialogContent>
+            </Dialog>
+            //End of Device Board's dialog
+          }
         </div>
       )}
     </>
