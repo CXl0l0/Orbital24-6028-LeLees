@@ -55,25 +55,14 @@ export const AdminHome = () => {
   const [overlayPage, setOverlayPage] = useState("");
   const [devices, setDevices] = useState([]);
 
-  useEffect(() => {
-    const devicesInStorage = JSON.parse(localStorage.getItem("devices"));
-    if (devicesInStorage) {
-      setDevices(devicesInStorage);
-    }
-  }, []);
-
   function handleRemoveDevice(e) {
     e.preventDefault();
     const index = devices.length - 1;
     setDevices([...devices.slice(0, index)]);
   }
 
-  function handleRemoveDevice2(name) {
-    setDevices(
-      devices.filter((device) => {
-        return device.deviceName !== name;
-      })
-    );
+  function handleRemoveDevice1(i) {
+    setDevices([...devices.slice(0, i), ...devices.slice(i + 1)]);
   }
 
   useEffect(() => {
@@ -92,17 +81,9 @@ export const AdminHome = () => {
       getDoc(deviceRef).then((deviceSnap) => {
         if (deviceSnap.exists()) {
           setAddingDevice(false);
-          setDevices([
-            ...devices,
-            <DeviceCard
-              viewDevice={handleViewDevice}
-              removeDevice={() =>
-                handleRemoveDevice2(deviceSnap.data().deviceName)
-              }
-              deviceName={deviceSnap.data().deviceName}
-              roomNumber={roomNum}
-            />,
-          ]);
+          //array of devices which is stored in array of size 2
+          //device[0] represents deviceName and device[1] represents roomNum
+          setDevices([...devices, [deviceSnap.data().deviceName, roomNum]]);
         } else {
           //invalid input
           console.log("Invalid Room Number");
@@ -132,7 +113,8 @@ export const AdminHome = () => {
         <AppBar position="static" color="secondary">
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <img src={logo} width={100}></img> urusai! Admin Home Page
+              <img src={logo} width={100} alt="urusai logo"></img> urusai! Admin
+              Home Page
             </Typography>
             <IconButton
               aria-label="settings"
@@ -212,10 +194,15 @@ export const AdminHome = () => {
           </center>
           <Box>
             <Grid container padding={4} spacing={6}>
-              {devices.map((device) => {
+              {devices.map((device, i) => {
                 return (
                   <Grid item xs={6} md={3}>
-                    {device}
+                    <DeviceCard
+                      deviceName={device[0]}
+                      roomNumber={device[1]}
+                      viewDevice={handleViewDevice}
+                      removeDevice={() => handleRemoveDevice1(i)}
+                    />
                   </Grid>
                 );
               })}

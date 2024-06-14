@@ -8,7 +8,7 @@ import Typography from "@mui/material/Typography";
 interface Props {
   deviceName: string;
   roomNumber: string;
-  viewDevice: () => null;
+  viewDevice: () => void;
   removeDevice: () => boolean;
 }
 
