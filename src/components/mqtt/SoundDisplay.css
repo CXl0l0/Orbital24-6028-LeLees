@@ -1,0 +1,12 @@
+.bar {
+  height: 5px;
+  width: 50px;
+  background-color: lightgray;
+  margin-top: 3px;
+}
+.on {
+  background-color: green;
+}
+.sound-display-container {
+  display: flex;
+}

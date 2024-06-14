@@ -51,6 +51,7 @@ export const AdminHome = () => {
   const [showDevice, setShowDevice] = useState(false);
   const [addingDevice, setAddingDevice] = useState(false);
   const [invalidRoomNumber, setInvalidRoomNumber] = useState(false);
+  const [helperText, setHelperText] = useState("");
   const [deviceBoard, setDeviceBoard] = useState(false);
   const [overlayPage, setOverlayPage] = useState("");
   const [devices, setDevices] = useState([]);
@@ -80,20 +81,34 @@ export const AdminHome = () => {
       //valid input (is number)
       getDoc(deviceRef).then((deviceSnap) => {
         if (deviceSnap.exists()) {
-          setAddingDevice(false);
-          //array of devices which is stored in array of size 2
-          //device[0] represents deviceName and device[1] represents roomNum
-          setDevices([...devices, [deviceSnap.data().deviceName, roomNum]]);
+          //Check if already added the device
+          const oldlen = devices.length;
+          const newlen = devices.filter((device) => {
+            return device[1] !== roomNum;
+          }).length;
+
+          if (newlen === oldlen) {
+            setAddingDevice(false);
+            //array of devices which is stored in array of size 2
+            //device[0] represents deviceName and device[1] represents roomNum
+            setDevices([...devices, [deviceSnap.data().deviceName, roomNum]]);
+          } else {
+            console.log("Already added this device");
+            setInvalidRoomNumber(true);
+            setHelperText("Already added this device");
+          }
         } else {
           //invalid input
           console.log("Invalid Room Number");
           setInvalidRoomNumber(true);
+          setHelperText("Invalid Room Number");
         }
       });
     } else {
       //invalid input
       console.log("Invalid Room Number");
       setInvalidRoomNumber(true);
+      setHelperText("Invalid Room Number");
     }
   }
 
@@ -233,7 +248,7 @@ export const AdminHome = () => {
                         fullWidth
                         variant="filled"
                         id="room-number"
-                        helperText="Invalid room number"
+                        helperText={helperText}
                       />
                     ) : (
                       <TextField

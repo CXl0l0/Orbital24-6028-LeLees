@@ -4,12 +4,14 @@ import { useState, useEffect } from "react";
 import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Box from "@mui/material/Box";
+import SoundDisplay from "./SoundDisplay";
 
 const ConnectDevice = () => {
   //Mqtt configurations
   const [client, setClient] = useState(null);
   const [payload, setPayload] = useState("");
   const [status, setStatus] = useState("Disconnected");
+  const [topic, setTopic] = useState("");
 
   useEffect(() => {
     if (client) {
@@ -27,7 +29,7 @@ const ConnectDevice = () => {
         console.log("MQTT Client Reconnecting");
       });
       client.on("message", (topic, payload) => {
-        setPayload(topic + ": " + payload);
+        setPayload(payload);
         console.log(payload.toString());
       });
     }
@@ -47,6 +49,7 @@ const ConnectDevice = () => {
       client.end(() => {
         console.log("Disconnected");
         setStatus("Disconnected");
+        setPayload("");
       });
     }
   }
@@ -59,10 +62,12 @@ const ConnectDevice = () => {
       }, 2000);
     } else if (status === "Subscribed") {
       client.unsubscribe("urusai1234");
+      setTopic("");
       console.log("Succesfully unsubscribed from urusai1234");
       setStatus("Connected");
     } else {
       client.subscribe("urusai1234");
+      setTopic("urusai1234");
       console.log("Successfully subscribed to urusai1234");
       setStatus("Subscribed");
     }
@@ -143,11 +148,16 @@ const ConnectDevice = () => {
           )
         }
       </Box>
-      <div>Status: {status}</div>
       <div>
+        Status: {status}
+        <br />
+        Topic subscribed: {topic}
+        <br />
         Message received: <br />
         {payload.toString()}
       </div>
+
+      <Box>{status === "Subscribed" && <SoundDisplay decibel={payload} />}</Box>
     </>
   );
 };
