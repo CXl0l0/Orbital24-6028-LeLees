@@ -46,7 +46,7 @@ void connectEMQX() {
     // Connect to the EMQX public MQTT broker (the server) on the address
     client.setServer(EMQX_endpoint, 1883);    // The standard MQTT port for secure communication with TLS is 8883 (1883 is the default and has no encryption - non-secure)
 
-    client.setCallback(subscribeMessage);    // 'subscribeMessage' will be called when a message arrives for a subscription to an MQTT topic.
+    //client.setCallback(subscribeMessage);    // 'subscribeMessage' will be called when a message arrives for a subscription to an MQTT topic.
 
     Serial.println("Connecting to EMQX...");
     while (!client.connect("ESP32")) {    // Returns Boolean (true: connection succeeded, false: connection failed)
@@ -94,12 +94,12 @@ void loop() {
     }
 
     if (!client.loop()){    // 'loop' allows the client (ESP32) to process incoming messages and maintain its connection to the server (AWS IoT Core).
-        connectEMQX();       // Returns true: the client is connected; or false: the client is not connected)
+        connectEMQX();       // Returns true: the client is connected; or false: the client is not connected
     }                       // If the client is not connected, attempts to connect again.
 
     sound = analogRead(AO);
     Serial.print("Sound value: ");
     Serial.println(sound);
     publishMessage();
-    delay(500);
+    delay(100);
 }
