@@ -1,3 +1,4 @@
+//Adapted from https://stackblitz.com/edit/react-vg2j4b?file=src%2FApp.js
 import React from "react";
 import { useEffect } from "react";
 import "./SoundDisplay.css";
@@ -82,6 +83,7 @@ const SoundDisplay = ({ decibel }) => {
         <div className="bar"></div>
         <div className="bar"></div>
         <div className="bar"></div>
+        Volume
       </div>
     </>
   );

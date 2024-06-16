@@ -36,7 +36,7 @@ const DeviceCard = ({
           View Device
         </Button>
         <Button color="error" size="small" onClick={removeDevice}>
-          Delete Device
+          Remove Device
         </Button>
       </CardActions>
     </Card>

@@ -50,20 +50,31 @@ export const AdminHome = () => {
   const [signingOut, setSigningOut] = useState(false);
   const [showDevice, setShowDevice] = useState(false);
   const [addingDevice, setAddingDevice] = useState(false);
+  const [removingDevice, setRemovingDevice] = useState(false);
+  const [targetRemovalDevice, setTargetRemovalDevice] = useState(null);
   const [invalidRoomNumber, setInvalidRoomNumber] = useState(false);
   const [helperText, setHelperText] = useState("");
   const [deviceBoard, setDeviceBoard] = useState(false);
   const [overlayPage, setOverlayPage] = useState("");
   const [devices, setDevices] = useState([]);
 
-  function handleRemoveDevice(e) {
+  function handleRemoveDevice1(e) {
     e.preventDefault();
     const index = devices.length - 1;
     setDevices([...devices.slice(0, index)]);
   }
 
-  function handleRemoveDevice1(i) {
-    setDevices([...devices.slice(0, i), ...devices.slice(i + 1)]);
+  function handleRemoveDevice() {
+    setDevices([
+      ...devices.slice(0, targetRemovalDevice),
+      ...devices.slice(targetRemovalDevice + 1),
+    ]);
+    setRemovingDevice(false);
+  }
+
+  function handleRemovingDevice(i) {
+    setRemovingDevice(true);
+    setTargetRemovalDevice(i);
   }
 
   useEffect(() => {
@@ -201,7 +212,7 @@ export const AdminHome = () => {
               showDevice && <ConnectDevice />
             }
             <Box sx={{ "& > button": { m: 1 } }}>
-              <Button variant="outlined" onClick={handleRemoveDevice}>
+              <Button variant="outlined" onClick={handleRemoveDevice1}>
                 - Remove Device
               </Button>
             </Box>
@@ -216,11 +227,37 @@ export const AdminHome = () => {
                       deviceName={device[0]}
                       roomNumber={device[1]}
                       viewDevice={handleViewDevice}
-                      removeDevice={() => handleRemoveDevice1(i)}
+                      removeDevice={() => handleRemovingDevice(i)}
                     />
                   </Grid>
                 );
               })}
+              {
+                //Removing Device's dialog
+                <Dialog
+                  open={removingDevice}
+                  onClose={() => setRemovingDevice(false)}
+                  aria-labelledby="remove-device-title"
+                  aria-describedby="remove-device-description"
+                >
+                  <DialogTitle>Removing a device...</DialogTitle>
+                  <DialogContent>
+                    <DialogContentText>
+                      You are about to remove this device, are you sure?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={() => setRemovingDevice(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" onClick={handleRemoveDevice}>
+                      Remove
+                    </Button>
+                  </DialogActions>
+                </Dialog>
+                //End of Removing Device's dialog
+              }
+
               <Button variant="outlined" onClick={() => setAddingDevice(true)}>
                 + Add Device
               </Button>
