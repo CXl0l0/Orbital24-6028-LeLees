@@ -5,7 +5,6 @@ import { auth, db } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import UserHome from "./User Page/UserHome";
 import { AdminHome } from "./Admin Page/AdminHome";
-import { useNavigate } from "react-router-dom";
 
 function Home() {
   useEffect(() => {
