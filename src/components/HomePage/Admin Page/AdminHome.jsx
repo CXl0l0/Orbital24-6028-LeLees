@@ -27,7 +27,7 @@ import ConnectDevice from "../../mqtt/ConnectDevice";
 import DeviceCard from "./DeviceCard";
 import { getDoc, doc } from "firebase/firestore";
 import { db } from "../../../firebase/firebase";
-import { io } from "socket.io-client";
+import { socket } from "../../../socket";
 
 //Taken from material UI "Full-screen dialogs" section under
 //https://mui.com/material-ui/react-dialog/
@@ -38,19 +38,21 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export const AdminHome = () => {
   //For navigating to other pages
   const navigate = useNavigate();
-  //Socket.io initialization
-  useEffect(() => {
-    const socket = io("http://localhost:5000");
-    console.log(socket);
-  }, []);
+
   //Firebase Sign Out function
   function userSignOut() {
     signOut(auth)
       .then(() => {
         console.log("Signed out successfully");
+        socket.disconnect();
       })
       .then(() => navigate("/"));
   }
+
+  //Socket.io connection
+  useEffect(() => {
+    console.log(socket.connect());
+  }, []);
 
   //Start of admin homepage logic components
   const [signingOut, setSigningOut] = useState(false);
