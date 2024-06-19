@@ -1,17 +1,24 @@
 import logo from "../../images/urusai.png";
 import "./LoginForm.css";
 import { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import {
+  browserSessionPersistence,
+  setPersistence,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { MdEmail } from "react-icons/md";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import HeaderIcon from "../HeaderIcon";
-import { auth } from "../../../firebase/firebase";
-import { Navigate } from "react-router-dom";
+import { auth, db } from "../../../firebase/firebase";
+import { useNavigate } from "react-router-dom";
 import "./LoginForm.css";
 import React from "react";
+import { doc, getDoc } from "firebase/firestore";
 
 function LoginForm() {
+  //For navigating to other pages
+  const navigate = useNavigate();
   function showPassword() {
     let password = document.getElementById("passwordInput");
 
@@ -30,26 +37,38 @@ function LoginForm() {
 
   const signIn = (e) => {
     e.preventDefault();
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.log(userCredential);
-      })
-      .then(() => {
-        setError(false);
-        setVerified(auth.currentUser.emailVerified);
-        console.log(auth.currentUser.email);
-        console.log(auth.currentUser.emailVerified);
-        setUserSignedIn(true);
-      })
-      .catch((error) => {
-        console.log(error);
-        setError(error);
-      });
+    //Persistence as session, enables logging into different account
+    //on different tabs
+    setPersistence(auth, browserSessionPersistence).then(() => {
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          console.log(userCredential);
+        })
+        .then(() => {
+          setError(false);
+          setVerified(auth.currentUser.emailVerified);
+          console.log(auth.currentUser.email);
+          console.log(auth.currentUser.emailVerified);
+          setUserSignedIn(true);
+          getDoc(doc(db, "accounts", auth.currentUser.uid)).then((userSnap) => {
+            const role = userSnap.data().role;
+            if (role === "user") {
+              console.log("user");
+              navigate("/userHome");
+            } else if (role === "administration") {
+              console.log("administration");
+              navigate("/adminHome");
+            }
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+          setError(error);
+        });
+    });
   };
 
-  return userSignedIn && verified ? (
-    <Navigate to="/home" />
-  ) : (
+  return (
     <>
       <body className="loginBody">
         <img className="logo" src={logo} alt="urusai logo" width={300}></img>

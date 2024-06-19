@@ -7,6 +7,8 @@ import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SignUpForm from "./components/auth/SignUpPage/SignUpForm";
 import ForgotPassword from "./components/auth/ForgotPasswordPage/ForgotPassword";
+import AdminHome from "./components/HomePage/Admin Page/AdminHome";
+import UserHome from "./components/HomePage/User Page/UserHome";
 
 const router = createBrowserRouter([
   {
@@ -24,6 +26,14 @@ const router = createBrowserRouter([
   {
     path: "forgotpassword",
     element: <ForgotPassword />,
+  },
+  {
+    path: "adminHome",
+    element: <AdminHome />,
+  },
+  {
+    path: "userHome",
+    element: <UserHome />,
   },
 ]);
 

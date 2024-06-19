@@ -1,5 +1,6 @@
+import "./AdminHome.css";
 import React, { useEffect, useState } from "react";
-import { signOut } from "firebase/auth";
+import { signOut, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../../firebase/firebase";
 import { IconButton } from "@mui/material";
 import { IoLogInOutline } from "react-icons/io5";
@@ -23,6 +24,7 @@ import Grid from "@mui/material/Unstable_Grid2";
 import TextField from "@mui/material/TextField";
 import Slide from "@mui/material/Slide";
 import CloseIcon from "@mui/icons-material/Close";
+import CircularProgress from "@mui/material/CircularProgress";
 import ConnectDevice from "../../mqtt/ConnectDevice";
 import DeviceCard from "./DeviceCard";
 import { getDoc, doc } from "firebase/firestore";
@@ -36,6 +38,11 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export const AdminHome = () => {
+  //Tab name
+  useEffect(() => {
+    document.title = "Admin Home";
+  }, []);
+
   //For navigating to other pages
   const navigate = useNavigate();
 
@@ -49,10 +56,28 @@ export const AdminHome = () => {
       .then(() => navigate("/"));
   }
 
+  //Auth user state
+  const [authUser, setAuthUser] = useState(null);
+  useEffect(() => {
+    const listen = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setAuthUser(user);
+      }
+    });
+
+    return () => {
+      listen();
+    };
+  }, []);
+
   //Socket.io connection
   useEffect(() => {
-    console.log(socket.connect());
-  }, []);
+    if (authUser) {
+      const reportSocket = socket.connect();
+      console.log(reportSocket);
+      socket.emit("newUser", authUser.displayName);
+    }
+  }, [authUser]);
 
   //Start of admin homepage logic components
   const [signingOut, setSigningOut] = useState(false);
@@ -141,224 +166,239 @@ export const AdminHome = () => {
 
   //End of admin homepage logic components
 
-  return (
+  return !authUser ? (
+    <div className="loading-icon">
+      <CircularProgress />
+    </div>
+  ) : (
     <>
-      <Box sx={{ flexGrow: 1 }}>
-        <AppBar position="static" color="secondary">
-          <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <img src={logo} width={100} alt="urusai logo"></img> urusai! Admin
-              Home Page
-            </Typography>
-            <IconButton
-              aria-label="settings"
-              onClick={() => setOverlayPage("Settings")}
-            >
-              <IoMdSettings size={30} />
-            </IconButton>
-            <IconButton
-              aria-label="account"
-              onClick={() => setOverlayPage("Account")}
-            >
-              <MdAccountCircle size={30} />
-            </IconButton>
-            <IconButton aria-label="logout" onClick={() => setSigningOut(true)}>
-              <IoLogInOutline size={30} />
-            </IconButton>
-            {
-              //Sign out dialog
-            }
-            <Dialog
-              open={signingOut}
-              onClose={() => setSigningOut(false)}
-              aria-labelledby="signOut-alert-title"
-              aria-describedby="signingOut-alert-description"
-            >
-              <DialogTitle id="signingOut-alert-title">Sign Out?</DialogTitle>
-              <DialogContent>
-                <DialogContentText id="signingOut-alert-description">
-                  You are about to sign out of urusai! Are you sure you want to
-                  sign out?
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setSigningOut(false)}>Stay</Button>
-                <Button onClick={userSignOut} autoFocus>
-                  Sign Out
-                </Button>
-              </DialogActions>
-            </Dialog>
-            {
-              //End of sign out dialog
-            }
-          </Toolbar>
-        </AppBar>
-      </Box>
-      {overlayPage !== "" ? (
-        overlayPage === "Settings" ? (
-          <SettingsPage goBack={() => setOverlayPage("")}></SettingsPage>
-        ) : (
-          overlayPage === "Account" && (
-            <AccountPage goBack={() => setOverlayPage("")}></AccountPage>
+      <div className="admin-home-container">
+        <Box sx={{ flexGrow: 1 }}>
+          <AppBar position="static" color="secondary">
+            <Toolbar>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                <img src={logo} width={100} alt="urusai logo"></img> urusai!
+                Admin Home Page
+              </Typography>
+              <IconButton
+                aria-label="settings"
+                onClick={() => setOverlayPage("Settings")}
+              >
+                <IoMdSettings size={30} />
+              </IconButton>
+              <IconButton
+                aria-label="account"
+                onClick={() => setOverlayPage("Account")}
+              >
+                <MdAccountCircle size={30} />
+              </IconButton>
+              <IconButton
+                aria-label="logout"
+                onClick={() => setSigningOut(true)}
+              >
+                <IoLogInOutline size={30} />
+              </IconButton>
+              {
+                //Sign out dialog
+              }
+              <Dialog
+                open={signingOut}
+                onClose={() => setSigningOut(false)}
+                aria-labelledby="signOut-alert-title"
+                aria-describedby="signingOut-alert-description"
+              >
+                <DialogTitle id="signingOut-alert-title">Sign Out?</DialogTitle>
+                <DialogContent>
+                  <DialogContentText id="signingOut-alert-description">
+                    You are about to sign out of urusai! Are you sure you want
+                    to sign out?
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={() => setSigningOut(false)}>Stay</Button>
+                  <Button onClick={userSignOut} autoFocus>
+                    Sign Out
+                  </Button>
+                </DialogActions>
+              </Dialog>
+              {
+                //End of sign out dialog
+              }
+            </Toolbar>
+          </AppBar>
+        </Box>
+        {overlayPage !== "" ? (
+          overlayPage === "Settings" ? (
+            <SettingsPage goBack={() => setOverlayPage("")}></SettingsPage>
+          ) : (
+            overlayPage === "Account" && (
+              <AccountPage goBack={() => setOverlayPage("")}></AccountPage>
+            )
           )
-        )
-      ) : (
-        <div>
-          <center>
-            <h2>Welcome to the home page, {auth.currentUser.displayName}!</h2>
-            <h4>Start by adding some devices</h4>
-            <Box sx={{ "& > button": { m: 1 } }}>
-              <Button variant="contained" onClick={() => setShowDevice(true)}>
-                Show Device
-              </Button>
-              <Button variant="contained" onClick={() => setShowDevice(false)}>
-                Unshow Device
-              </Button>
+        ) : (
+          <div>
+            <center>
+              <h2>Welcome to the home page, {authUser?.displayName}!</h2>
+              <h4>Start by adding some devices</h4>
+              <Box sx={{ "& > button": { m: 1 } }}>
+                <Button variant="contained" onClick={() => setShowDevice(true)}>
+                  Show Device
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => setShowDevice(false)}
+                >
+                  Unshow Device
+                </Button>
+              </Box>
+              {
+                //Add device section
+                showDevice && <ConnectDevice />
+              }
+              <Box sx={{ "& > button": { m: 1 } }}>
+                <Button variant="outlined" onClick={handleRemoveDevice1}>
+                  - Remove Device
+                </Button>
+              </Box>
+              <h3>Your Devices</h3>
+            </center>
+            <Box>
+              <Grid container padding={4} spacing={6}>
+                {devices.map((device, i) => {
+                  return (
+                    <Grid item xs={6} md={3}>
+                      <DeviceCard
+                        deviceName={device[0]}
+                        roomNumber={device[1]}
+                        viewDevice={handleViewDevice}
+                        removeDevice={() => handleRemovingDevice(i)}
+                      />
+                    </Grid>
+                  );
+                })}
+                {
+                  //Removing Device's dialog
+                  <Dialog
+                    open={removingDevice}
+                    onClose={() => setRemovingDevice(false)}
+                    aria-labelledby="remove-device-title"
+                    aria-describedby="remove-device-description"
+                  >
+                    <DialogTitle>Removing a device...</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText>
+                        You are about to remove this device, are you sure?
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={() => setRemovingDevice(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" onClick={handleRemoveDevice}>
+                        Remove
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                  //End of Removing Device's dialog
+                }
+
+                <Button
+                  variant="outlined"
+                  onClick={() => setAddingDevice(true)}
+                >
+                  + Add Device
+                </Button>
+                {
+                  //Adding Device's dialog
+                  <Dialog
+                    open={addingDevice}
+                    onClose={() => setAddingDevice(false)}
+                    aria-labelledby="add-device-title"
+                    aria-describedby="add-device-description"
+                  >
+                    <DialogTitle>Adding a device...</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText>
+                        Please enter your room number.
+                      </DialogContentText>
+                      {invalidRoomNumber ? ( //entered invalid room number
+                        <TextField
+                          autoFocus
+                          error
+                          required
+                          margin="dense"
+                          label="Room Number"
+                          type="text"
+                          fullWidth
+                          variant="filled"
+                          id="room-number"
+                          helperText={helperText}
+                        />
+                      ) : (
+                        <TextField
+                          autoFocus
+                          required
+                          margin="dense"
+                          label="Room Number"
+                          type="text"
+                          fullWidth
+                          variant="filled"
+                          id="room-number"
+                        />
+                      )}
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={() => setAddingDevice(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="submit" onClick={handleAddDevice}>
+                        Add
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                  //End of Adding Device's dialog
+                }
+              </Grid>
             </Box>
+
             {
-              //Add device section
-              showDevice && <ConnectDevice />
+              //Start of Device Board's dialog
+              <Dialog
+                fullScreen
+                open={deviceBoard}
+                onClose={handleCloseDevice}
+                TransitionComponent={Transition}
+              >
+                <AppBar sx={{ position: "relative" }}>
+                  <Toolbar>
+                    <IconButton
+                      edge="start"
+                      color="inherit"
+                      onClick={handleCloseDevice}
+                      aria-label="close"
+                    >
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography
+                      sx={{ ml: 2, flex: 1 }}
+                      variant="h6"
+                      component="div"
+                    >
+                      Device
+                    </Typography>
+                  </Toolbar>
+                </AppBar>
+                <DialogContent>
+                  <center>
+                    <ConnectDevice />
+                  </center>
+                </DialogContent>
+              </Dialog>
+              //End of Device Board's dialog
             }
-            <Box sx={{ "& > button": { m: 1 } }}>
-              <Button variant="outlined" onClick={handleRemoveDevice1}>
-                - Remove Device
-              </Button>
-            </Box>
-            <h3>Your Devices</h3>
-          </center>
-          <Box>
-            <Grid container padding={4} spacing={6}>
-              {devices.map((device, i) => {
-                return (
-                  <Grid item xs={6} md={3}>
-                    <DeviceCard
-                      deviceName={device[0]}
-                      roomNumber={device[1]}
-                      viewDevice={handleViewDevice}
-                      removeDevice={() => handleRemovingDevice(i)}
-                    />
-                  </Grid>
-                );
-              })}
-              {
-                //Removing Device's dialog
-                <Dialog
-                  open={removingDevice}
-                  onClose={() => setRemovingDevice(false)}
-                  aria-labelledby="remove-device-title"
-                  aria-describedby="remove-device-description"
-                >
-                  <DialogTitle>Removing a device...</DialogTitle>
-                  <DialogContent>
-                    <DialogContentText>
-                      You are about to remove this device, are you sure?
-                    </DialogContentText>
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={() => setRemovingDevice(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" onClick={handleRemoveDevice}>
-                      Remove
-                    </Button>
-                  </DialogActions>
-                </Dialog>
-                //End of Removing Device's dialog
-              }
-
-              <Button variant="outlined" onClick={() => setAddingDevice(true)}>
-                + Add Device
-              </Button>
-              {
-                //Adding Device's dialog
-                <Dialog
-                  open={addingDevice}
-                  onClose={() => setAddingDevice(false)}
-                  aria-labelledby="add-device-title"
-                  aria-describedby="add-device-description"
-                >
-                  <DialogTitle>Adding a device...</DialogTitle>
-                  <DialogContent>
-                    <DialogContentText>
-                      Please enter your room number.
-                    </DialogContentText>
-                    {invalidRoomNumber ? ( //entered invalid room number
-                      <TextField
-                        autoFocus
-                        error
-                        required
-                        margin="dense"
-                        label="Room Number"
-                        type="text"
-                        fullWidth
-                        variant="filled"
-                        id="room-number"
-                        helperText={helperText}
-                      />
-                    ) : (
-                      <TextField
-                        autoFocus
-                        required
-                        margin="dense"
-                        label="Room Number"
-                        type="text"
-                        fullWidth
-                        variant="filled"
-                        id="room-number"
-                      />
-                    )}
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={() => setAddingDevice(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" onClick={handleAddDevice}>
-                      Add
-                    </Button>
-                  </DialogActions>
-                </Dialog>
-                //End of Adding Device's dialog
-              }
-            </Grid>
-          </Box>
-
-          {
-            //Start of Device Board's dialog
-            <Dialog
-              fullScreen
-              open={deviceBoard}
-              onClose={handleCloseDevice}
-              TransitionComponent={Transition}
-            >
-              <AppBar sx={{ position: "relative" }}>
-                <Toolbar>
-                  <IconButton
-                    edge="start"
-                    color="inherit"
-                    onClick={handleCloseDevice}
-                    aria-label="close"
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                  <Typography
-                    sx={{ ml: 2, flex: 1 }}
-                    variant="h6"
-                    component="div"
-                  >
-                    Device
-                  </Typography>
-                </Toolbar>
-              </AppBar>
-              <DialogContent>
-                <center>
-                  <ConnectDevice />
-                </center>
-              </DialogContent>
-            </Dialog>
-            //End of Device Board's dialog
-          }
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </>
   );
 };
