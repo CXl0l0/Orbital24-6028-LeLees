@@ -1,6 +1,9 @@
 import "./AdminHome.css";
 import React, { useEffect, useState } from "react";
 import { signOut, onAuthStateChanged } from "firebase/auth";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "../../../firebase/firebase";
+import { socket } from "../../../socket";
 import { auth } from "../../../firebase/firebase";
 import { IconButton } from "@mui/material";
 import { IoLogInOutline } from "react-icons/io5";
@@ -27,9 +30,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import CircularProgress from "@mui/material/CircularProgress";
 import ConnectDevice from "../../mqtt/ConnectDevice";
 import DeviceCard from "./DeviceCard";
-import { getDoc, doc } from "firebase/firestore";
-import { db } from "../../../firebase/firebase";
-import { socket } from "../../../socket";
 
 //Taken from material UI "Full-screen dialogs" section under
 //https://mui.com/material-ui/react-dialog/
@@ -78,6 +78,13 @@ export const AdminHome = () => {
       socket.emit("newUser", authUser.displayName);
     }
   }, [authUser]);
+
+  //Socket.io listener
+  useEffect(() => {
+    socket.on("getReport", (msg) => {
+      console.log("received report from: " + msg.clientName);
+    });
+  }, [socket]);
 
   //Start of admin homepage logic components
   const [signingOut, setSigningOut] = useState(false);

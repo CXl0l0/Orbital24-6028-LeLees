@@ -28,8 +28,24 @@ io.on("connection", (socket) => {
   console.log("Connection detected");
 
   socket.on("newUser", (username) => {
+    //When new user log in
     addNewUser(username, socket.id);
     console.log(onlineUsers);
+  });
+
+  socket.on("reportNotification", (clientName, receiverName) => {
+    console.log("received report from: " + clientName);
+    const receiver = getUser(receiverName);
+    if (receiver) {
+      //Admin online
+      console.log("Sending report to: " + receiverName);
+      io.to(receiver.socketId).emit("getReport", {
+        clientName,
+      });
+    } else {
+      //Handle admin offline situation
+      console.log("Receiver not online at the moment");
+    }
   });
 
   socket.on("disconnect", () => {
