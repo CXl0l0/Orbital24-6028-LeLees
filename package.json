@@ -13,6 +13,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "aws-iot-device-sdk-v2": "^1.19.5",
+    "concurrently": "^8.2.2",
     "express": "^4.19.2",
     "firebase": "^10.12.1",
     "mqtt": "^5.7.0",
@@ -27,7 +28,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "concurrently \"npm run start:server\" \"npm run start:ui\"",
+    "start:server": "cd socket-server && npm start",
+    "start:ui": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
