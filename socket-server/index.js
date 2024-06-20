@@ -8,10 +8,13 @@ const server = createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "https://master.dnb6ycggt35yz.amplifyapp.com/",
+    //origin: "*",
     methods: ["GET", "POST"],
   },
 });
+const PORT = process.env.PORT || 8000;
+console.log(PORT);
 
 let onlineUsers = [];
 
@@ -61,4 +64,4 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(8080, () => console.log("listening on port 8080"));
+server.listen(PORT, () => console.log("listening on port 8000"));
