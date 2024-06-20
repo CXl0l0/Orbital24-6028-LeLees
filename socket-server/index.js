@@ -1,7 +1,12 @@
 //Tutorial from https://www.youtube.com/watch?v=7vVqMR96T5o
 import { Server } from "socket.io";
+import e from "express";
+import { createServer } from "http";
 
-const io = new Server({
+const app = e();
+const server = createServer(app);
+
+const io = new Server(server, {
   cors: {
     origin: "*",
     methods: ["GET", "POST"],
