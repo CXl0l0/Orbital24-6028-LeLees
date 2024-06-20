@@ -2,14 +2,16 @@
 import { Server } from "socket.io";
 import e from "express";
 import { createServer } from "http";
+import cors from "cors";
 
 const app = e();
 const server = createServer(app);
+app.use(cors);
 
 const io = new Server(server, {
   cors: {
-    origin: "https://master.dnb6ycggt35yz.amplifyapp.com/",
-    //origin: "*",
+    origin:
+      "http://localhost:8080 || https://master.dnb6ycggt35yz.amplifyapp.com/",
     methods: ["GET", "POST"],
   },
 });
