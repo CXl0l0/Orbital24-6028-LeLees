@@ -7,17 +7,6 @@ import Typography from "@mui/material/Typography";
 import { socket } from "../../socket";
 
 const NotificationPage = (prop) => {
-  const [notifications, setNotifications] = useState([]);
-
-  //Socket.io listener
-  useEffect(() => {
-    socket.on("getReport", (msg) => {
-      const reporter = msg.clientName;
-      console.log("received report from: " + reporter);
-      setNotifications((prev) => [...prev, reporter]);
-    });
-  }, [socket]);
-
   return (
     <>
       <Box>
@@ -32,7 +21,7 @@ const NotificationPage = (prop) => {
       </Box>
       <div className="notification-dashboard">
         <h4>You will receive notifications here</h4>
-        {notifications.map((notification) => {
+        {prop.notifications.map((notification) => {
           return <div>You've received a report from {notification}</div>;
         })}
       </div>

@@ -175,7 +175,7 @@ const UserHome = () => {
     <>
       <div className="user-home-container">
         <Box sx={{ flexGrow: 1 }}>
-          <AppBar position="static" color="secondary">
+          <AppBar position="static" color="primary">
             <Toolbar>
               <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                 <img src={logo} width={100}></img> urusai! User Home Page

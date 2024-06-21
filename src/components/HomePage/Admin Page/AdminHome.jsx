@@ -30,6 +30,7 @@ import TextField from "@mui/material/TextField";
 import Slide from "@mui/material/Slide";
 import CloseIcon from "@mui/icons-material/Close";
 import CircularProgress from "@mui/material/CircularProgress";
+import Badge from "@mui/material/Badge";
 import ConnectDevice from "../../mqtt/ConnectDevice";
 import DeviceCard from "./DeviceCard";
 
@@ -76,11 +77,28 @@ export const AdminHome = () => {
   useEffect(() => {
     if (authUser) {
       const reportSocket = socket.connect();
-      socket.removeAllListeners();
       console.log(reportSocket);
       socket.emit("newUser", authUser.displayName);
     }
   }, [socket, authUser]);
+
+  const [notifications, setNotifications] = useState([]);
+
+  //Socket.io listener
+  useEffect(() => {
+    const handleGetReport = (msg) => {
+      const reporter = msg.clientName;
+      console.log("received report from: " + reporter);
+      setNotifications((prev) => [...prev, reporter]);
+    };
+
+    socket.on("getReport", handleGetReport);
+
+    // Cleanup function to remove the listener on component unmount
+    return () => {
+      socket.off("getReport", handleGetReport);
+    };
+  }, [socket]);
 
   //Start of admin homepage logic components
   const [signingOut, setSigningOut] = useState(false);
@@ -187,7 +205,14 @@ export const AdminHome = () => {
                 aria-label="notification"
                 onClick={() => setOverlayPage("Notification")}
               >
-                <IoIosNotifications size={30} />
+                <Badge
+                  badgeContent={notifications.length}
+                  max={9}
+                  overlap="circular"
+                  color="error"
+                >
+                  <IoIosNotifications size={30} />
+                </Badge>
               </IconButton>
               <IconButton
                 aria-label="settings"
@@ -240,7 +265,10 @@ export const AdminHome = () => {
           overlayPage === "Settings" ? (
             <SettingsPage goBack={() => setOverlayPage("")}></SettingsPage>
           ) : overlayPage === "Notification" ? (
-            <NotificationPage goBack={() => setOverlayPage("")} />
+            <NotificationPage
+              notifications={notifications}
+              goBack={() => setOverlayPage("")}
+            />
           ) : (
             overlayPage === "Account" && (
               <AccountPage goBack={() => setOverlayPage("")}></AccountPage>
