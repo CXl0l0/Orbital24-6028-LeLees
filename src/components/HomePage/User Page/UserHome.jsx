@@ -68,8 +68,7 @@ const UserHome = () => {
   //Socket.io connection
   useEffect(() => {
     if (authUser) {
-      const reportSocket = socket.connect();
-      console.log(reportSocket);
+      console.log(socket.connect());
       socket.emit("newUser", authUser.displayName);
     }
   }, [authUser]);
@@ -77,6 +76,7 @@ const UserHome = () => {
   //Socket.io function
 
   function handleReport() {
+    console.log(socket);
     socket.emit("reportNotification", authUser.displayName, "CX");
   }
 

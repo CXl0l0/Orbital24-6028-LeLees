@@ -11,7 +11,7 @@ app.use(cors);
 const io = new Server(server, {
   cors: {
     origin:
-      "http://localhost:8080 || https://master.dnb6ycggt35yz.amplifyapp.com/",
+      "[http://localhost:8080, https://master.dnb6ycggt35yz.amplifyapp.com/]",
     methods: ["GET", "POST"],
   },
 });
