@@ -10,6 +10,7 @@ import { IoLogInOutline } from "react-icons/io5";
 import { MdAccountCircle } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { IoIosNotifications } from "react-icons/io";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -18,6 +19,7 @@ import Button from "@mui/material/Button";
 import logo from "../../images/urusai.png";
 import SettingsPage from "../SettingsPage";
 import AccountPage from "../AccountPage";
+import NotificationPage from "../NotificationPage";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -74,17 +76,11 @@ export const AdminHome = () => {
   useEffect(() => {
     if (authUser) {
       const reportSocket = socket.connect();
+      socket.removeAllListeners();
       console.log(reportSocket);
       socket.emit("newUser", authUser.displayName);
     }
-  }, [authUser]);
-
-  //Socket.io listener
-  useEffect(() => {
-    socket.on("getReport", (msg) => {
-      console.log("received report from: " + msg.clientName);
-    });
-  }, [socket]);
+  }, [socket, authUser]);
 
   //Start of admin homepage logic components
   const [signingOut, setSigningOut] = useState(false);
@@ -188,6 +184,12 @@ export const AdminHome = () => {
                 Admin Home Page
               </Typography>
               <IconButton
+                aria-label="notification"
+                onClick={() => setOverlayPage("Notification")}
+              >
+                <IoIosNotifications size={30} />
+              </IconButton>
+              <IconButton
                 aria-label="settings"
                 onClick={() => setOverlayPage("Settings")}
               >
@@ -237,6 +239,8 @@ export const AdminHome = () => {
         {overlayPage !== "" ? (
           overlayPage === "Settings" ? (
             <SettingsPage goBack={() => setOverlayPage("")}></SettingsPage>
+          ) : overlayPage === "Notification" ? (
+            <NotificationPage goBack={() => setOverlayPage("")} />
           ) : (
             overlayPage === "Account" && (
               <AccountPage goBack={() => setOverlayPage("")}></AccountPage>

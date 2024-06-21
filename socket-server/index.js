@@ -6,12 +6,11 @@ import cors from "cors";
 
 const app = e();
 const server = createServer(app);
-app.use(cors);
+app.use(cors());
 
 const io = new Server(server, {
   cors: {
-    origin:
-      "[http://localhost:8080, https://vercel.com/cxl0l0s-projects/orbital24-6028-le-lees/4uu1ahaJWFcojzAg7jmi2Gp3Kzye]",
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
