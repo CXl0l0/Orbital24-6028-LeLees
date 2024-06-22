@@ -82,8 +82,6 @@ export const AdminHome = () => {
     }
   }, [socket, authUser]);
 
-  const [notifications, setNotifications] = useState([]);
-
   //Socket.io listener
   useEffect(() => {
     const handleGetReport = (msg) => {
@@ -99,6 +97,8 @@ export const AdminHome = () => {
       socket.off("getReport", handleGetReport);
     };
   }, [socket]);
+
+  const [notifications, setNotifications] = useState([]);
 
   //Start of admin homepage logic components
   const [signingOut, setSigningOut] = useState(false);
@@ -292,7 +292,7 @@ export const AdminHome = () => {
               </Box>
               {
                 //Add device section
-                showDevice && <ConnectDevice />
+                showDevice && <ConnectDevice role={"administration"} />
               }
               <Box sx={{ "& > button": { m: 1 } }}>
                 <Button variant="outlined" onClick={handleRemoveDevice1}>
@@ -429,7 +429,7 @@ export const AdminHome = () => {
                 </AppBar>
                 <DialogContent>
                   <center>
-                    <ConnectDevice />
+                    <ConnectDevice role={"administration"} />
                   </center>
                 </DialogContent>
               </Dialog>

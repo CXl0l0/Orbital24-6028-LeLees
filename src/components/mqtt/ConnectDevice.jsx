@@ -5,8 +5,9 @@ import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Box from "@mui/material/Box";
 import SoundDisplay from "./SoundDisplay";
+import { socket } from "../../socket";
 
-const ConnectDevice = () => {
+const ConnectDevice = ({ role, authUser }) => {
   //Mqtt configurations
   const [client, setClient] = useState(null);
   const [payload, setPayload] = useState("");
@@ -74,6 +75,13 @@ const ConnectDevice = () => {
   }
 
   //End of Mqtt configuration
+
+  //Socket.io function
+
+  function handleReport() {
+    console.log(socket);
+    socket.emit("reportNotification", authUser.displayName, "CX");
+  }
 
   return (
     <>
@@ -146,6 +154,20 @@ const ConnectDevice = () => {
               Subscribe
             </Button>
           )
+        }
+        <br />
+        {
+          //Report button's behavior
+          role === "user" &&
+            (status === "Subscribed" ? (
+              <Button variant="contained" onClick={handleReport}>
+                Report
+              </Button>
+            ) : (
+              <Button variant="contained" onClick={handleReport} disabled>
+                Report
+              </Button>
+            ))
         }
       </Box>
       <div>
