@@ -93,7 +93,7 @@ const UserHome = () => {
   const [targetRemovalDevice, setTargetRemovalDevice] = useState(null);
   const [invalidRoomNumber, setInvalidRoomNumber] = useState(false);
   const [helperText, setHelperText] = useState("");
-  const [deviceBoard, setDeviceBoard] = useState(false);
+  const [deviceBoard, setDeviceBoard] = useState(null);
   const [overlayPage, setOverlayPage] = useState("");
   const [devices, setDevices] = useState([]);
 
@@ -162,12 +162,12 @@ const UserHome = () => {
     }
   }
 
-  function handleViewDevice() {
-    setDeviceBoard(true);
+  function handleViewDevice(roomNum) {
+    setDeviceBoard(roomNum);
   }
 
   function handleCloseDevice() {
-    setDeviceBoard(false);
+    setDeviceBoard(null);
   }
 
   //End of admin homepage logic components
@@ -298,7 +298,7 @@ const UserHome = () => {
                       <DeviceCard
                         deviceName={device[0]}
                         roomNumber={device[1]}
-                        viewDevice={handleViewDevice}
+                        viewDevice={() => handleViewDevice(device[1])}
                         removeDevice={() => handleRemovingDevice(i)}
                       />
                     </Grid>
@@ -418,7 +418,11 @@ const UserHome = () => {
                 </AppBar>
                 <DialogContent>
                   <center>
-                    <ConnectDevice role={"user"} authUser={authUser} />
+                    <ConnectDevice
+                      role={"user"}
+                      authUser={authUser}
+                      roomNum={deviceBoard}
+                    />
                   </center>
                 </DialogContent>
               </Dialog>

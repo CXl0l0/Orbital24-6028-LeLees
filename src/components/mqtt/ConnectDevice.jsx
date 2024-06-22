@@ -1,13 +1,15 @@
 import React from "react";
 import mqtt from "mqtt";
 import { useState, useEffect } from "react";
+import { getDoc, doc } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
 import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Box from "@mui/material/Box";
 import SoundDisplay from "./SoundDisplay";
 import { socket } from "../../socket";
 
-const ConnectDevice = ({ role, authUser }) => {
+const ConnectDevice = ({ role, authUser, roomNum }) => {
   //Mqtt configurations
   const [client, setClient] = useState(null);
   const [payload, setPayload] = useState("");
@@ -80,7 +82,15 @@ const ConnectDevice = ({ role, authUser }) => {
 
   function handleReport() {
     console.log(socket);
-    socket.emit("reportNotification", authUser.displayName, "CX");
+    const deviceRef = doc(db, "devices", roomNum);
+    if (deviceRef) {
+      getDoc(deviceRef).then((deviceSnap) => {
+        if (deviceSnap.exists()) {
+          const pic = deviceSnap.data().pic;
+          socket.emit("reportNotification", authUser.displayName, pic, roomNum);
+        }
+      });
+    }
   }
 
   return (

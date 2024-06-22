@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
     console.log(onlineUsers);
   });
 
-  socket.on("reportNotification", (clientName, receiverName) => {
+  socket.on("reportNotification", (clientName, receiverName, roomNum) => {
     console.log("received report from: " + clientName);
     const receiver = getUser(receiverName);
     if (receiver) {
@@ -51,6 +51,7 @@ io.on("connection", (socket) => {
       console.log("Sending report to: " + receiverName);
       io.to(receiver.socketId).emit("getReport", {
         clientName,
+        roomNum,
       });
     } else {
       //Handle admin offline situation
