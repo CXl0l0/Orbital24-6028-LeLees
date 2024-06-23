@@ -30,6 +30,7 @@ const AdminDevicePage = () => {
   const [addingDevice, setAddingDevice] = useState(false);
   const [removingDevice, setRemovingDevice] = useState(false);
   const [invalidRoomNumber, setInvalidRoomNumber] = useState(false);
+  const [viewingDevice, setViewingDevice] = useState(["Error", "Error"]);
   const [targetRemovalDevice, setTargetRemovalDevice] = useState(null);
   const [helperText, setHelperText] = useState("");
   const [devices, setDevices] = useState([]);
@@ -106,7 +107,10 @@ const AdminDevicePage = () => {
                 <AdminDeviceCard
                   deviceName={device[0]}
                   roomNumber={device[1]}
-                  viewDevice={() => setDeviceBoard(true)}
+                  viewDevice={() => {
+                    setDeviceBoard(true);
+                    setViewingDevice([device[0], device[1]]);
+                  }}
                   removeDevice={() => handleRemovingDevice(i)}
                 />
               </Grid>
@@ -215,7 +219,11 @@ const AdminDevicePage = () => {
           </AppBar>
           <DialogContent>
             <center>
-              <ConnectDevice role={"administration"} />
+              <ConnectDevice
+                role={"administration"}
+                deviceName={viewingDevice[0]}
+                roomNum={viewingDevice[1]}
+              />
             </center>
           </DialogContent>
         </Dialog>

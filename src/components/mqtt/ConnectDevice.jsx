@@ -9,7 +9,7 @@ import Box from "@mui/material/Box";
 import SoundDisplay from "./SoundDisplay";
 import { socket } from "../../socket";
 
-const ConnectDevice = ({ role, authUser, roomNum }) => {
+const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
   //Mqtt configurations
   const [client, setClient] = useState(null);
   const [payload, setPayload] = useState("");
@@ -95,6 +95,7 @@ const ConnectDevice = ({ role, authUser, roomNum }) => {
           });
           setDoc(doc(db, "report", "admin", pic, roomNum), {
             reporter: authUser.displayName,
+            reporterUID: authUser.uid,
           });
           //emit report event to socket.io server
           socket.emit("reportNotification", authUser.displayName, pic, roomNum);
@@ -105,6 +106,10 @@ const ConnectDevice = ({ role, authUser, roomNum }) => {
 
   return (
     <>
+      <center>
+        <h1>{deviceName}</h1>
+        <h4>Room {roomNum}</h4>
+      </center>
       <Box sx={{ "& > button": { m: 1 } }}>
         {
           //Connect button's behavior

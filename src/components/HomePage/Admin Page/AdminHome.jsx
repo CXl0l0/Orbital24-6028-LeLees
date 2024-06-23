@@ -33,12 +33,6 @@ import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import AdminDevicePage from "./AdminDevicePage";
 
-//Taken from material UI "Full-screen dialogs" section under
-//https://mui.com/material-ui/react-dialog/
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
 export const AdminHome = () => {
   //Tab name
   useEffect(() => {
@@ -216,7 +210,7 @@ export const AdminHome = () => {
                     <AdminDevicePage />
                   </TabPanel>
                   <TabPanel value="reportsTab">
-                    <AdminReportPage />
+                    <AdminReportPage authUser={authUser} />
                   </TabPanel>
                 </TabContext>
               </Box>

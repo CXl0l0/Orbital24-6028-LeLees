@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { db } from "../../../firebase/firebase";
-import { collection, onSnapshot, getDocs, query } from "firebase/firestore";
+import { collection, getDocs, query } from "firebase/firestore";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -27,11 +27,7 @@ const UserReportPage = ({ authUser }) => {
       getDocs(q)
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
-            console.log(doc.data());
-            console.log(doc.id);
             temp.push([doc.id, doc.data()]);
-            console.log(temp);
-            console.log(temp.length);
           });
         })
         .then(() => {

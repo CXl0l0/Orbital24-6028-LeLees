@@ -31,6 +31,7 @@ const UserDevicePage = ({ authUser }) => {
   const [removingDevice, setRemovingDevice] = useState(false);
   const [targetRemovalDevice, setTargetRemovalDevice] = useState(null);
   const [invalidRoomNumber, setInvalidRoomNumber] = useState(false);
+  const [viewingDevice, setViewingDevice] = useState(["Error", "Error"]);
   const [helperText, setHelperText] = useState("");
   const [deviceBoard, setDeviceBoard] = useState(null);
   const [devices, setDevices] = useState([]);
@@ -107,7 +108,10 @@ const UserDevicePage = ({ authUser }) => {
                 <UserDeviceCard
                   deviceName={device[0]}
                   roomNumber={device[1]}
-                  viewDevice={() => setDeviceBoard(device[1])}
+                  viewDevice={() => {
+                    setDeviceBoard(device[1]);
+                    setViewingDevice([device[0], device[1]]);
+                  }}
                   removeDevice={() => handleRemovingDevice(i)}
                 />
               </Grid>
@@ -220,6 +224,7 @@ const UserDevicePage = ({ authUser }) => {
                 role={"user"}
                 authUser={authUser}
                 roomNum={deviceBoard}
+                deviceName={viewingDevice[0]}
               />
             </center>
           </DialogContent>
