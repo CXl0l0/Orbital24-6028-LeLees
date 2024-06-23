@@ -5,7 +5,7 @@ const URL =
     ? "https://master.dnb6ycggt35yz.amplifyapp.com/"
     : "ws://localhost:8000";
 
-export const socket = io("https://master.dnb6ycggt35yz.amplifyapp.com/", {
+export const socket = io(URL, {
   autoConnect: false,
-  transports: ["websocket"],
+  transports: ["polling"],
 });
