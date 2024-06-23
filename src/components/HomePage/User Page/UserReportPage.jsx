@@ -8,9 +8,12 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import { IconButton } from "@mui/material";
+import { IoIosRefresh } from "react-icons/io";
 
 const UserReportPage = ({ authUser }) => {
   const [reports, setReports] = useState([]);
+  const [refresh, setRefresh] = useState(true);
 
   //Read report data from Firestore
   const initialized = useRef(false);
@@ -32,14 +35,21 @@ const UserReportPage = ({ authUser }) => {
           });
         })
         .then(() => {
-          console.log("Finally");
           setReports(temp);
         });
     }
-  }, []);
+  }, [refresh]);
 
   return (
     <>
+      <IconButton
+        onClick={() => {
+          initialized.current = false;
+          setRefresh(!refresh);
+        }}
+      >
+        <IoIosRefresh />
+      </IconButton>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>

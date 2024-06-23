@@ -3,10 +3,16 @@ import { Server } from "socket.io";
 import e from "express";
 import { createServer } from "http";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = e();
 const server = createServer(app);
 app.use(cors());
+const PORT = process.env.PORT || 8000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const staticPath = path.join(__dirname, "build");
 
 const io = new Server(server, {
   cors: {
@@ -14,8 +20,6 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
-const PORT = process.env.PORT || 8000;
-console.log(PORT);
 
 let onlineUsers = [];
 
@@ -66,4 +70,12 @@ io.on("connection", (socket) => {
   });
 });
 
-server.listen(PORT, () => console.log("listening on port 8000"));
+if (process.env.NODE_ENV === "production") {
+  app.get("*", (req, res) => {
+    app.use(e.static(staticPath));
+    const indexFile = path.join(__dirname, "build", "index.html");
+    return res.sendFile(indexFile);
+  });
+}
+
+server.listen(PORT, () => console.log("listening on port " + PORT));
