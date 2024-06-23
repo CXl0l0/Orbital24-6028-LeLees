@@ -17,7 +17,7 @@ import TextField from "@mui/material/TextField";
 import Slide from "@mui/material/Slide";
 import CloseIcon from "@mui/icons-material/Close";
 import ConnectDevice from "../../mqtt/ConnectDevice";
-import DeviceCard from "./DeviceCard";
+import AdminDeviceCard from "./AdminDeviceCard";
 
 //Taken from material UI "Full-screen dialogs" section under
 //https://mui.com/material-ui/react-dialog/
@@ -25,15 +25,13 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const DevicePage = () => {
-  const [signingOut, setSigningOut] = useState(false);
+const AdminDevicePage = () => {
   const [deviceBoard, setDeviceBoard] = useState(false);
   const [addingDevice, setAddingDevice] = useState(false);
   const [removingDevice, setRemovingDevice] = useState(false);
   const [invalidRoomNumber, setInvalidRoomNumber] = useState(false);
   const [targetRemovalDevice, setTargetRemovalDevice] = useState(null);
   const [helperText, setHelperText] = useState("");
-  const [overlayPage, setOverlayPage] = useState("");
   const [devices, setDevices] = useState([]);
 
   function handleRemoveDevice() {
@@ -105,7 +103,7 @@ const DevicePage = () => {
           {devices.map((device, i) => {
             return (
               <Grid item xs={6} md={3}>
-                <DeviceCard
+                <AdminDeviceCard
                   deviceName={device[0]}
                   roomNumber={device[1]}
                   viewDevice={() => setDeviceBoard(true)}
@@ -227,4 +225,4 @@ const DevicePage = () => {
   );
 };
 
-export default DevicePage;
+export default AdminDevicePage;

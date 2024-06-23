@@ -15,7 +15,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import logo from "../../images/urusai.png";
-import ReportPage from "./ReportPage";
+import AdminReportPage from "./AdminReportPage";
 import SettingsPage from "../SettingsPage";
 import AccountPage from "../AccountPage";
 import NotificationPage from "../NotificationPage";
@@ -31,7 +31,7 @@ import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
-import DevicePage from "./DevicePage";
+import AdminDevicePage from "./AdminDevicePage";
 
 //Taken from material UI "Full-screen dialogs" section under
 //https://mui.com/material-ui/react-dialog/
@@ -204,19 +204,19 @@ export const AdminHome = () => {
           ) : (
             //Default home page
             <>
-              <Box sx={{ width: "100" }}>
+              <Box sx={{ width: "100%" }}>
                 <TabContext value={tabValue}>
                   <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                    <TabList onChange={handleTabChange}>
-                      <Tab label="Add Device" value="addDeviceTab" />
+                    <TabList onChange={handleTabChange} centered>
+                      <Tab label="Devices" value="addDeviceTab" />
                       <Tab label="Reports" value="reportsTab" />
                     </TabList>
                   </Box>
                   <TabPanel value="addDeviceTab">
-                    <DevicePage />
+                    <AdminDevicePage />
                   </TabPanel>
                   <TabPanel value="reportsTab">
-                    <ReportPage />
+                    <AdminReportPage />
                   </TabPanel>
                 </TabContext>
               </Box>

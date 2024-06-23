@@ -12,7 +12,7 @@ interface Props {
   removeDevice: () => boolean;
 }
 
-const DeviceCard = ({
+const UserDeviceCard = ({
   deviceName,
   roomNumber,
   viewDevice,
@@ -43,4 +43,4 @@ const DeviceCard = ({
   );
 };
 
-export default DeviceCard;
+export default UserDeviceCard;

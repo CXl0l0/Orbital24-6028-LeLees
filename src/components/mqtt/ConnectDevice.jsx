@@ -1,7 +1,7 @@
 import React from "react";
 import mqtt from "mqtt";
 import { useState, useEffect } from "react";
-import { getDoc, doc } from "firebase/firestore";
+import { getDoc, setDoc, doc } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -81,12 +81,22 @@ const ConnectDevice = ({ role, authUser, roomNum }) => {
   //Socket.io function
 
   function handleReport() {
+    //Only for user
     console.log(socket);
     const deviceRef = doc(db, "devices", roomNum);
     if (deviceRef) {
       getDoc(deviceRef).then((deviceSnap) => {
         if (deviceSnap.exists()) {
           const pic = deviceSnap.data().pic;
+          //Record report case
+          setDoc(doc(db, "report", "user", authUser.uid, roomNum), {
+            reporter: authUser.displayName,
+            pic: pic,
+          });
+          setDoc(doc(db, "report", "admin", pic, roomNum), {
+            reporter: authUser.displayName,
+          });
+          //emit report event to socket.io server
           socket.emit("reportNotification", authUser.displayName, pic, roomNum);
         }
       });
@@ -170,11 +180,16 @@ const ConnectDevice = ({ role, authUser, roomNum }) => {
           //Report button's behavior
           role === "user" &&
             (status === "Subscribed" ? (
-              <Button variant="contained" onClick={handleReport}>
+              <Button variant="contained" color="error" onClick={handleReport}>
                 Report
               </Button>
             ) : (
-              <Button variant="contained" onClick={handleReport} disabled>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleReport}
+                disabled
+              >
                 Report
               </Button>
             ))
