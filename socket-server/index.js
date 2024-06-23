@@ -8,11 +8,13 @@ import { fileURLToPath } from "url";
 
 const app = e();
 const server = createServer(app);
-app.use(cors());
 const PORT = process.env.PORT || 8000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const staticPath = path.join(__dirname, "build");
+
+app.use(cors());
+app.use(e.static(staticPath));
 
 const io = new Server(server, {
   cors: {
