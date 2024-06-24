@@ -6,8 +6,9 @@ import { db } from "../../firebase/firebase";
 import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Box from "@mui/material/Box";
-import SoundDisplay from "./SoundDisplay";
+import SoundBar from "./SoundBar";
 import { socket } from "../../socket";
+import SoundVisualizer from "./SoundVisualizer";
 
 const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
   //Mqtt configurations
@@ -209,7 +210,14 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
         {payload.toString()}
       </div>
 
-      <Box>{status === "Subscribed" && <SoundDisplay decibel={payload} />}</Box>
+      <Box>
+        {status === "Subscribed" && (
+          <>
+            <SoundBar decibel={payload} />
+            <SoundVisualizer decibel={parseInt(payload)} />
+          </>
+        )}
+      </Box>
     </>
   );
 };

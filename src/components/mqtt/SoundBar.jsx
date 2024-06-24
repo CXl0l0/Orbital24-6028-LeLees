@@ -1,9 +1,9 @@
 //Adapted from https://stackblitz.com/edit/react-vg2j4b?file=src%2FApp.js
 import React from "react";
 import { useEffect } from "react";
-import "./SoundDisplay.css";
+import "./SoundBar.css";
 
-const SoundDisplay = ({ decibel }) => {
+const SoundBar = ({ decibel }) => {
   useEffect(() => {
     var bars = document.getElementsByClassName("bar");
     const len = bars.length;
@@ -89,4 +89,4 @@ const SoundDisplay = ({ decibel }) => {
   );
 };
 
-export default SoundDisplay;
+export default SoundBar;
