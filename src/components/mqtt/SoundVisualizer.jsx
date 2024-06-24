@@ -48,7 +48,7 @@ const SoundVisualizer = ({ decibel }) => {
         const labels = [...prevData.labels, new Date().toLocaleTimeString()];
         const data = [...prevData.datasets[0].data, decibel];
 
-        if (labels.length > 30) {
+        if (labels.length > 10) {
           labels.shift();
           data.shift();
         }

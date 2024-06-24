@@ -2,12 +2,13 @@ import "./AdminHome.css";
 import React, { useEffect, useState } from "react";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import { socket } from "../../../socket";
-import { auth } from "../../../firebase/firebase";
+import { auth, db } from "../../../firebase/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import { IconButton } from "@mui/material";
 import { IoLogInOutline } from "react-icons/io5";
 import { MdAccountCircle } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { IoIosNotifications } from "react-icons/io";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -24,14 +25,15 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
 import CircularProgress from "@mui/material/CircularProgress";
+import Tooltip from "@mui/material/Tooltip";
 import Badge from "@mui/material/Badge";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import AdminDevicePage from "./AdminDevicePage";
+import CreateDevicePage from "./CreateDevicePage";
 
 export const AdminHome = () => {
   //Tab name
@@ -65,6 +67,23 @@ export const AdminHome = () => {
       listen();
     };
   }, []);
+
+  //User role
+  const [role, setRole] = useState(null);
+  useEffect(() => {
+    console.log("Reading firestore");
+    if (authUser) {
+      const userRef = doc(db, "accounts", authUser.uid);
+      getDoc(userRef).then((userSnap) => {
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          setRole(userData.role);
+        } else {
+          console.log("User doesnt exist in database");
+        }
+      });
+    }
+  }, [authUser]);
 
   //Socket.io connection
   useEffect(() => {
@@ -106,51 +125,75 @@ export const AdminHome = () => {
 
   //End of admin homepage logic components
 
-  return !authUser ? (
+  return !authUser || !role ? (
     <div className="loading-icon">
-      <CircularProgress />
+      <CircularProgress color="secondary" />
     </div>
+  ) : role === "user" ? (
+    <>
+      <Navigate to={"/"} />
+    </>
   ) : (
     <>
       <div className="admin-home-container">
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static" color="secondary">
             <Toolbar>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                <img src={logo} width={100} alt="urusai logo"></img> urusai!
-                Admin Home Page
+              <img src={logo} width={100} alt="urusai logo"></img>
+              <Typography
+                variant="h6"
+                component="a"
+                noWrap
+                href="/adminHome"
+                sx={{
+                  fontFamily: "revert",
+                  fontWeight: 600,
+                  flexGrow: 1,
+                  color: "inherit",
+                  textDecoration: "none",
+                }}
+              >
+                urusai! Admin Home Page
               </Typography>
-              <IconButton
-                aria-label="notification"
-                onClick={() => setOverlayPage("Notification")}
-              >
-                <Badge
-                  badgeContent={notifications.length}
-                  max={9}
-                  overlap="circular"
-                  color="error"
+              <Tooltip title="Notification">
+                <IconButton
+                  aria-label="notification"
+                  onClick={() => setOverlayPage("Notification")}
                 >
-                  <IoIosNotifications size={30} />
-                </Badge>
-              </IconButton>
-              <IconButton
-                aria-label="settings"
-                onClick={() => setOverlayPage("Settings")}
-              >
-                <IoMdSettings size={30} />
-              </IconButton>
-              <IconButton
-                aria-label="account"
-                onClick={() => setOverlayPage("Account")}
-              >
-                <MdAccountCircle size={30} />
-              </IconButton>
-              <IconButton
-                aria-label="logout"
-                onClick={() => setSigningOut(true)}
-              >
-                <IoLogInOutline size={30} />
-              </IconButton>
+                  <Badge
+                    badgeContent={notifications.length}
+                    max={9}
+                    overlap="circular"
+                    color="error"
+                  >
+                    <IoIosNotifications size={30} />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Settings">
+                <IconButton
+                  aria-label="settings"
+                  onClick={() => setOverlayPage("Settings")}
+                >
+                  <IoMdSettings size={30} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Account">
+                <IconButton
+                  aria-label="account"
+                  onClick={() => setOverlayPage("Account")}
+                >
+                  <MdAccountCircle size={30} />
+                </IconButton>
+              </Tooltip>
+              <Tooltip title="Logout">
+                <IconButton
+                  aria-label="logout"
+                  onClick={() => setSigningOut(true)}
+                >
+                  <IoLogInOutline size={30} />
+                </IconButton>
+              </Tooltip>
               {
                 //Sign out dialog
               }
@@ -202,10 +245,14 @@ export const AdminHome = () => {
                 <TabContext value={tabValue}>
                   <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                     <TabList onChange={handleTabChange} centered>
+                      <Tab label="Create Device" value="createDeviceTab" />
                       <Tab label="Devices" value="addDeviceTab" />
                       <Tab label="Reports" value="reportsTab" />
                     </TabList>
                   </Box>
+                  <TabPanel value="createDeviceTab">
+                    <CreateDevicePage />
+                  </TabPanel>
                   <TabPanel value="addDeviceTab">
                     <AdminDevicePage />
                   </TabPanel>

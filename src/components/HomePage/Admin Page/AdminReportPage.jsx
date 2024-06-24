@@ -9,20 +9,26 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Snackbar from "@mui/material/Snackbar";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogActions from "@mui/material/DialogActions";
-import Button from "@mui/material/Button";
-import { IconButton, Tab } from "@mui/material";
+import { IconButton, Tooltip, LinearProgress } from "@mui/material";
 import { IoIosRefresh } from "react-icons/io";
+import { FaCrow } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa";
 
 const AdminReportPage = ({ authUser }) => {
+  const initialLoad = useRef(false);
+
   const [reports, setReports] = useState([]);
   const [refresh, setRefresh] = useState(true);
+
+  //Snackbar logic
   const [snackbar, setSnackbar] = useState(false);
+  function handleCloseSnackBar(event, reason) {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setSnackbar(false);
+  }
 
   //Read report data from Firestore
   const initialized = useRef(false);
@@ -41,9 +47,20 @@ const AdminReportPage = ({ authUser }) => {
         })
         .then(() => {
           setReports(temp);
+        })
+        .then(() => {
+          initialLoad.current = true;
         });
     }
   }, [refresh]);
+
+  /*
+  const dbListener = onSnapshot(
+    collection(db, "report", "admin", authUser.displayName),
+    (collection) => {
+      console.log("Something changed");
+    }
+  );*/
 
   //Force render bypass method from
   //https://stackoverflow.com/questions/30626030/can-you-force-a-react-component-to-rerender-without-calling-setstate
@@ -59,7 +76,6 @@ const AdminReportPage = ({ authUser }) => {
     const reporter = reports[i][1].reporter;
     const userUID = reports[i][1].reporterUID;
     console.log(roomNum + " " + userUID);
-    setSnackbar(true);
 
     deleteDoc(doc(db, "report", "admin", authUser.displayName, roomNum))
       .then(() => {
@@ -73,21 +89,19 @@ const AdminReportPage = ({ authUser }) => {
           "Resolved",
         ];
         setReports(temp);
+        setSnackbar(true);
       })
       .then(() => {
         handleClick();
       });
   }
 
-  function handleCloseSnackBar(event, reason) {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setSnackbar(false);
-  }
-
-  return (
+  return !initialLoad.current ? (
+    <>
+      <br />
+      <LinearProgress />
+    </>
+  ) : (
     <>
       <IconButton
         onClick={() => {
@@ -98,14 +112,14 @@ const AdminReportPage = ({ authUser }) => {
         <IoIosRefresh />
       </IconButton>
       <TableContainer component={Paper}>
-        <Table>
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell align="center">Index</TableCell>
               <TableCell align="center">Room Number</TableCell>
               <TableCell align="center">Reporter</TableCell>
               <TableCell align="center">Status</TableCell>
-              <TableCell align="center">Resolve</TableCell>
+              <TableCell align="center"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -127,9 +141,14 @@ const AdminReportPage = ({ authUser }) => {
                         <FaCheck size={20} />
                       </IconButton>
                     ) : (
-                      <IconButton onClick={() => handleResolve(i)}>
-                        <FaCheck size={20} />
-                      </IconButton>
+                      <Tooltip title="Resolve">
+                        <IconButton
+                          color="success"
+                          onClick={() => handleResolve(i)}
+                        >
+                          <FaCheck size={20} />
+                        </IconButton>
+                      </Tooltip>
                     )}
                     {
                       //Snackbar for resolving report
@@ -147,6 +166,12 @@ const AdminReportPage = ({ authUser }) => {
           </TableBody>
         </Table>
       </TableContainer>
+      <br />
+      {reports.length === 0 && (
+        <center>
+          <FaCrow /> All quiet...
+        </center>
+      )}
     </>
   );
 };
