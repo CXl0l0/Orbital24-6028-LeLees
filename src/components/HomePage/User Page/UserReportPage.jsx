@@ -13,6 +13,7 @@ import { IconButton, Tooltip, Snackbar, LinearProgress } from "@mui/material";
 import { IoIosRefresh } from "react-icons/io";
 import { MdCancel } from "react-icons/md";
 import { FaCrow } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 
 const UserReportPage = ({ authUser }) => {
   const initialLoad = useRef(false);
@@ -62,6 +63,17 @@ const UserReportPage = ({ authUser }) => {
     forceUpdate();
   }
   //End
+
+  function handleDelete(i) {
+    console.log(reports);
+    console.log(i);
+    const roomNum = reports[i][0];
+
+    deleteDoc(doc(db, "report", "user", authUser.uid, roomNum)).then(() => {
+      initialized.current = false;
+      setRefresh(!refresh);
+    });
+  }
 
   function handleCancel(i) {
     const roomNum = reports[i][0];
@@ -152,8 +164,8 @@ const UserReportPage = ({ authUser }) => {
                   <TableCell align="center">
                     {row[1].status === "Cancelled" ||
                     row[1].status === "Resolved" ? (
-                      <IconButton disabled>
-                        <MdCancel />
+                      <IconButton onClick={() => handleDelete(i)} color="error">
+                        <FaTrash size={20} />
                       </IconButton>
                     ) : (
                       <Tooltip title="Cancel">

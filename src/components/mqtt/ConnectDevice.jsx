@@ -9,6 +9,14 @@ import Box from "@mui/material/Box";
 import SoundBar from "./SoundBar";
 import { socket } from "../../socket";
 import SoundVisualizer from "./SoundVisualizer";
+import {
+  TextField,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
+import Dialog from "@mui/material/Dialog";
 
 const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
   //Mqtt configurations
@@ -82,7 +90,8 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
 
   //End of Mqtt configuration
 
-  //Socket.io function
+  //Report function
+  const [reporting, setReporting] = useState(false);
 
   function handleReport() {
     //Only for user
@@ -104,7 +113,7 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
           });
           setDoc(doc(db, "report", "admin", pic, roomNum), {
             reporter: authUser.displayName,
-            reporterUID: authUser.uid,
+            userUID: authUser.uid,
             status: "Pending",
             time: time,
             date: date,
@@ -197,19 +206,50 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
           //Report button's behavior
           role === "user" &&
             (status === "Subscribed" ? (
-              <Button variant="contained" color="error" onClick={handleReport}>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => setReporting(true)}
+              >
                 Report
               </Button>
             ) : (
               <Button
                 variant="contained"
                 color="error"
-                onClick={handleReport}
+                onClick={() => setReporting(true)}
                 disabled
               >
                 Report
               </Button>
             ))
+        }
+        {
+          //Report dialog
+          <Dialog open={reporting} onClose={() => setReporting(false)}>
+            <DialogTitle>Reporting to administration</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                You are about to report an issue to the administration. Please
+                illustrate your problem briefly.
+              </DialogContentText>
+              <TextField
+                autoFocus
+                required
+                id="description"
+                type="text"
+                fullWidth
+                margin="dense"
+                variant="standard"
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setReporting(false)}>Cancel</Button>
+              <Button type="submit" onClick={handleReport} color="error">
+                Proceed
+              </Button>
+            </DialogActions>
+          </Dialog>
         }
       </Box>
       <div>

@@ -1,7 +1,7 @@
 import React from "react";
 
 const CreateDevicePage = () => {
-  return <div>CreateDevicePage</div>;
+  return <div>Not available yet</div>;
 };
 
 export default CreateDevicePage;

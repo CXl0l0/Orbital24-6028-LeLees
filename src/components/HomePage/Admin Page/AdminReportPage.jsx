@@ -83,20 +83,19 @@ const AdminReportPage = ({ authUser }) => {
     console.log(reports);
     console.log(i);
     const roomNum = reports[i][0];
-    const userUID = reports[i][1].reporterUID;
-    deleteDoc(doc(db, "report", "admin", authUser.displayName, roomNum))
-      .then(() => {
-        deleteDoc(doc(db, "report", "user", userUID, roomNum));
-      })
-      .then(() => {
+
+    deleteDoc(doc(db, "report", "admin", authUser.displayName, roomNum)).then(
+      () => {
+        initialized.current = false;
         setRefresh(!refresh);
-      });
+      }
+    );
   }
 
   function handleResolve(i) {
     const roomNum = reports[i][0];
     const reporter = reports[i][1].reporter;
-    const userUID = reports[i][1].reporterUID;
+    const userUID = reports[i][1].userUID;
     const time = reports[i][1].time;
     const date = reports[i][1].date;
     console.log(roomNum + " " + userUID);
@@ -146,6 +145,7 @@ const AdminReportPage = ({ authUser }) => {
     <>
       <IconButton
         onClick={() => {
+          //Refresh
           initialized.current = false;
           setRefresh(!refresh);
         }}

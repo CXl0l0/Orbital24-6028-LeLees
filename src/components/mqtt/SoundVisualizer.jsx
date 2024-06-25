@@ -9,18 +9,28 @@ the decibel data I have."
 */
 
 import React, { useEffect, useState } from "react";
-import { Bar } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   BarElement,
   CategoryScale,
   LinearScale,
+  PointElement,
+  LineElement,
+  Filler,
 } from "chart.js";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale);
+ChartJS.register(
+  Filler,
+  LineElement,
+  PointElement,
+  BarElement,
+  CategoryScale,
+  LinearScale
+);
 
 const SoundVisualizer = ({ decibel }) => {
-  const [chartData, setChartData] = useState({
+  const [barData, setBarData] = useState({
     labels: [],
     datasets: [
       {
@@ -28,6 +38,20 @@ const SoundVisualizer = ({ decibel }) => {
         data: [],
         backgroundColor: "aqua",
         borderWidth: 1,
+      },
+    ],
+  });
+
+  const [lineData, setLineData] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: "Decibels",
+        data: [],
+        fill: true,
+        backgroundColor: "rgba(75,192,192,0.2)",
+        borderColor: "rgba(75,192,192,1)",
+        borderWidth: 4,
       },
     ],
   });
@@ -43,8 +67,8 @@ const SoundVisualizer = ({ decibel }) => {
   };
 
   useEffect(() => {
-    const updateChart = () => {
-      setChartData((prevData) => {
+    const updateBar = () => {
+      setBarData((prevData) => {
         const labels = [...prevData.labels, new Date().toLocaleTimeString()];
         const data = [...prevData.datasets[0].data, decibel];
 
@@ -65,14 +89,42 @@ const SoundVisualizer = ({ decibel }) => {
       });
     };
 
-    const interval = setInterval(updateChart, 40); // Update every second
+    const updateLine = () => {
+      setLineData((prevData) => {
+        const labels = [...prevData.labels, new Date().toLocaleTimeString()];
+        const data = [...prevData.datasets[0].data, decibel];
 
-    return () => clearInterval(interval);
+        if (labels.length > 60) {
+          labels.shift();
+          data.shift();
+        }
+
+        return {
+          labels,
+          datasets: [
+            {
+              ...prevData.datasets[0],
+              data,
+            },
+          ],
+        };
+      });
+    };
+
+    //Update
+    const barInterval = setInterval(updateBar, 30);
+    const lineInterval = setInterval(updateLine, 30);
+
+    return () => {
+      clearInterval(barInterval);
+      clearInterval(lineInterval);
+    };
   }, [decibel]);
 
   return (
     <>
-      <Bar data={chartData} options={options} />
+      <Bar data={barData} options={options} />
+      <Line data={lineData} options={options} />
     </>
   );
 };
