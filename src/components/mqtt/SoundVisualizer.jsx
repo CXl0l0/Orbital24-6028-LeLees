@@ -48,7 +48,7 @@ const SoundVisualizer = ({ decibel }) => {
         const labels = [...prevData.labels, new Date().toLocaleTimeString()];
         const data = [...prevData.datasets[0].data, decibel];
 
-        if (labels.length > 10) {
+        if (labels.length > 60) {
           labels.shift();
           data.shift();
         }
@@ -65,7 +65,7 @@ const SoundVisualizer = ({ decibel }) => {
       });
     };
 
-    const interval = setInterval(updateChart, 1000); // Update every second
+    const interval = setInterval(updateChart, 40); // Update every second
 
     return () => clearInterval(interval);
   }, [decibel]);

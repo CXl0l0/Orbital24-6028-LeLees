@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState, useReducer } from "react";
 import { db } from "../../../firebase/firebase";
-import { doc, collection, getDocs, query, deleteDoc } from "firebase/firestore";
+import {
+  doc,
+  collection,
+  getDocs,
+  query,
+  deleteDoc,
+  setDoc,
+} from "firebase/firestore";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -13,6 +20,7 @@ import { IconButton, Tooltip, LinearProgress } from "@mui/material";
 import { IoIosRefresh } from "react-icons/io";
 import { FaCrow } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 
 const AdminReportPage = ({ authUser }) => {
   const initialLoad = useRef(false);
@@ -42,7 +50,7 @@ const AdminReportPage = ({ authUser }) => {
       getDocs(q)
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
-            temp.push([doc.id, doc.data(), "Pending"]);
+            temp.push([doc.id, doc.data()]);
           });
         })
         .then(() => {
@@ -71,22 +79,55 @@ const AdminReportPage = ({ authUser }) => {
   }
   //End
 
-  function handleResolve(i) {
+  function handleDelete(i) {
+    console.log(reports);
+    console.log(i);
     const roomNum = reports[i][0];
-    const reporter = reports[i][1].reporter;
     const userUID = reports[i][1].reporterUID;
-    console.log(roomNum + " " + userUID);
-
     deleteDoc(doc(db, "report", "admin", authUser.displayName, roomNum))
       .then(() => {
         deleteDoc(doc(db, "report", "user", userUID, roomNum));
       })
       .then(() => {
+        setRefresh(!refresh);
+      });
+  }
+
+  function handleResolve(i) {
+    const roomNum = reports[i][0];
+    const reporter = reports[i][1].reporter;
+    const userUID = reports[i][1].reporterUID;
+    const time = reports[i][1].time;
+    const date = reports[i][1].date;
+    console.log(roomNum + " " + userUID);
+
+    setDoc(doc(db, "report", "admin", authUser.displayName, roomNum), {
+      reporter: reporter,
+      userUID: userUID,
+      status: "Resolved",
+      time: time,
+      date: date,
+    })
+      .then(() => {
+        setDoc(doc(db, "report", "user", userUID, roomNum), {
+          reporter: reporter,
+          pic: authUser.displayName,
+          status: "Resolved",
+          time: time,
+          date: date,
+        });
+      })
+      .then(() => {
         var temp = reports;
         temp[i] = [
           roomNum,
-          { reporter: reporter, userUID: userUID },
-          "Resolved",
+          {
+            reporter: reporter,
+            userUID: userUID,
+            status: "Resolved",
+            time: time,
+            date: date,
+          },
         ];
         setReports(temp);
         setSnackbar(true);
@@ -116,6 +157,8 @@ const AdminReportPage = ({ authUser }) => {
           <TableHead>
             <TableRow>
               <TableCell align="center">Index</TableCell>
+              <TableCell align="center">Date</TableCell>
+              <TableCell align="center">Time Reported</TableCell>
               <TableCell align="center">Room Number</TableCell>
               <TableCell align="center">Reporter</TableCell>
               <TableCell align="center">Status</TableCell>
@@ -133,12 +176,15 @@ const AdminReportPage = ({ authUser }) => {
                     {i + 1}
                   </TableCell>
                   <TableCell align="center">{row[0]}</TableCell>
+                  <TableCell align="center">{row[1].date}</TableCell>
+                  <TableCell align="center">{row[1].time}</TableCell>
                   <TableCell align="center">{row[1].reporter}</TableCell>
-                  <TableCell align="center">{row[2]}</TableCell>
+                  <TableCell align="center">{row[1].status}</TableCell>
                   <TableCell align="center">
-                    {row[2] === "Resolved" ? (
-                      <IconButton disabled>
-                        <FaCheck size={20} />
+                    {row[1].status === "Resolved" ||
+                    row[1].status === "Cancelled" ? (
+                      <IconButton onClick={() => handleDelete(i)} color="error">
+                        <FaTrash size={20} />
                       </IconButton>
                     ) : (
                       <Tooltip title="Resolve">

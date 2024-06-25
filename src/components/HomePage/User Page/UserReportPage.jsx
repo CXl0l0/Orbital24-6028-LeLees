@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useReducer } from "react";
 import { db } from "../../../firebase/firebase";
-import { deleteDoc, doc } from "firebase/firestore";
+import { deleteDoc, doc, setDoc } from "firebase/firestore";
 import { collection, getDocs, query } from "firebase/firestore";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -42,7 +42,7 @@ const UserReportPage = ({ authUser }) => {
       getDocs(q)
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
-            temp.push([doc.id, doc.data(), "Pending"]);
+            temp.push([doc.id, doc.data()]);
           });
         })
         .then(() => {
@@ -66,19 +66,38 @@ const UserReportPage = ({ authUser }) => {
   function handleCancel(i) {
     const roomNum = reports[i][0];
     const pic = reports[i][1].pic;
+    const time = reports[i][1].time;
+    const date = reports[i][1].date;
     console.log(roomNum + " " + pic);
     setSnackbar(true);
 
-    deleteDoc(doc(db, "report", "admin", pic, roomNum))
+    setDoc(doc(db, "report", "admin", pic, roomNum), {
+      reporter: authUser.displayName,
+      userUID: authUser.uid,
+      status: "Cancelled",
+      time: time,
+      date: date,
+    })
       .then(() => {
-        deleteDoc(doc(db, "report", "user", authUser.uid, roomNum));
+        setDoc(doc(db, "report", "user", authUser.uid, roomNum), {
+          reporter: authUser.displayName,
+          pic: pic,
+          status: "Cancelled",
+          time: time,
+          date: date,
+        });
       })
       .then(() => {
         var temp = reports;
         temp[i] = [
           roomNum,
-          { pic: pic, reporter: authUser.displayName },
-          "Cancelled",
+          {
+            pic: pic,
+            reporter: authUser.displayName,
+            status: "Cancelled",
+            time: time,
+            date: date,
+          },
         ];
         setReports(temp);
       })
@@ -108,6 +127,8 @@ const UserReportPage = ({ authUser }) => {
             <TableRow>
               <TableCell align="center">Index</TableCell>
               <TableCell align="center">Room Number</TableCell>
+              <TableCell align="center">Date</TableCell>
+              <TableCell align="center">Time Reported</TableCell>
               <TableCell align="center">Person In Charge</TableCell>
               <TableCell align="center">Status</TableCell>
               <TableCell align="center"></TableCell>
@@ -124,10 +145,13 @@ const UserReportPage = ({ authUser }) => {
                     {i + 1}
                   </TableCell>
                   <TableCell align="center">{row[0]}</TableCell>
+                  <TableCell align="center">{row[1].date}</TableCell>
+                  <TableCell align="center">{row[1].time}</TableCell>
                   <TableCell align="center">{row[1].pic}</TableCell>
-                  <TableCell align="center">{row[2]}</TableCell>
+                  <TableCell align="center">{row[1].status}</TableCell>
                   <TableCell align="center">
-                    {row[2] === "Cancelled" ? (
+                    {row[1].status === "Cancelled" ||
+                    row[1].status === "Resolved" ? (
                       <IconButton disabled>
                         <MdCancel />
                       </IconButton>

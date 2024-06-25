@@ -1,8 +1,9 @@
 const mqtt = require("mqtt");
-var client = mqtt.connect("wss://broker.emqx.io:8084/mqtt");
+//var client = mqtt.connect("wss://broker.emqx.io:8084/mqtt");
+var client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
 
 client.on("connect", function () {
-  client.subscribe("urusai");
+  client.subscribe("urusai1234");
   console.log("Client has subscribed successfully");
 });
 

@@ -33,8 +33,11 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
         console.log("MQTT Client Reconnecting");
       });
       client.on("message", (topic, payload) => {
-        setPayload(payload);
-        console.log(payload.toString());
+        const jsonString = new TextDecoder().decode(payload);
+        const jsonData = JSON.parse(jsonString);
+        const soundValue = jsonData["Sound value"];
+        console.log(soundValue);
+        setPayload(soundValue);
       });
     }
   }, [client]);
@@ -83,6 +86,8 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
 
   function handleReport() {
     //Only for user
+    const time = new Date().toLocaleTimeString();
+    const date = new Date().toLocaleDateString();
     console.log(socket);
     const deviceRef = doc(db, "devices", roomNum);
     if (deviceRef) {
@@ -93,10 +98,16 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
           setDoc(doc(db, "report", "user", authUser.uid, roomNum), {
             reporter: authUser.displayName,
             pic: pic,
+            status: "Pending",
+            time: time,
+            date: date,
           });
           setDoc(doc(db, "report", "admin", pic, roomNum), {
             reporter: authUser.displayName,
             reporterUID: authUser.uid,
+            status: "Pending",
+            time: time,
+            date: date,
           });
           //emit report event to socket.io server
           socket.emit("reportNotification", authUser.displayName, pic, roomNum);
@@ -214,7 +225,7 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
         {status === "Subscribed" && (
           <>
             <SoundBar decibel={payload} />
-            <SoundVisualizer decibel={parseInt(payload)} />
+            <SoundVisualizer decibel={payload} />
           </>
         )}
       </Box>
