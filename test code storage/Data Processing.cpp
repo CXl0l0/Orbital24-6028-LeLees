@@ -11,17 +11,17 @@ void setup() {
 
 void loop() {
     int sound;
-    const int arraySize = 10;
+    const int arraySize = 100;
     int array[arraySize];    // Creates an array named 'array' that can hold up to 'arraySize' 'int' type elements.
     int sum = 0;
     for (int index = 0; index < arraySize; index++){    // Syntax: for (initialization; condition; increment) {}
         sound = analogRead(AO);    // It's 12-bit here, so it can read a value from 0 to 4095
         Serial.println(sound);
         array[index] = sound;      // Store the sound value in the array at index 'index'.
-        sum += sound;              // Calculating the sum of 10 readings, so that we can find the average sound value in the end.
-        delay(100);
+        sum += sound;              // Calculating the sum of 100 readings, so that we can find the average sound value in the end.
+        delay(10);
     }
-    // Print the maximum and minimum sound value in every 10 readings
+    // Print the maximum and minimum sound value in every 100 readings
     
     char buffer[50];    // This creates an array named 'buffer' that can hold up to 50 'char' type elements. 'char' arrays are often used to store strings as strings in C is an array of characters terminated by the null character '\0'. So 'char buffer[50]' reserves space for a string of up to 49 characters plus the null terminator.
     
@@ -66,8 +66,8 @@ void loop() {
     Serial.print(buffer);    // After storing your formatted string into your buffer, you can finally serial print it out.
     Serial.print(' ');
     Serial.println(*Max - *Min);
-    // Serial.print("n = ");
-    // Serial.println(n);    // 'n', as explained above, should be the length of the formatted string, which should be 18 if the 'Max' and 'Min' values are 3-digit
+    //Serial.print("n = ");
+    //Serial.println(n);    // 'n', as explained above, should be the length of the formatted string, which should be 18 if the 'Max' and 'Min' values are 3-digit
 
     float average = float(sum) / float(arraySize);   // Float division, '/' alone, without the three 'float's is floor division.
     Serial.print("Average = ");

@@ -119,5 +119,5 @@ void loop() {
     Serial.print("Sound value: ");
     Serial.println(sound);
     publishMessage();
-    delay(1000);
+    delay(100);
 }
