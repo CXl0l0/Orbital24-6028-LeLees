@@ -9,11 +9,10 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { IconButton, Tooltip, Snackbar, LinearProgress } from "@mui/material";
+import { IconButton, LinearProgress } from "@mui/material";
 import { IoIosRefresh } from "react-icons/io";
-import { MdCancel } from "react-icons/md";
 import { FaCrow } from "react-icons/fa";
-import { FaTrash } from "react-icons/fa";
+import UserReportInfo from "./UserReportInfo";
 
 const UserReportPage = ({ authUser }) => {
   const initialLoad = useRef(false);
@@ -21,21 +20,10 @@ const UserReportPage = ({ authUser }) => {
   const [reports, setReports] = useState([]);
   const [refresh, setRefresh] = useState(true);
 
-  //Snackbar logic
-  const [snackbar, setSnackbar] = useState(false);
-  function handleCloseSnackBar(event, reason) {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setSnackbar(false);
-  }
-
   //Read report data from Firestore
   const initialized = useRef(false);
   useEffect(() => {
     if (!initialized.current) {
-      initialized.current = true;
       console.log("Reading firestore");
       const reportRef = collection(db, "report", "user", authUser.uid);
       const q = query(reportRef);
@@ -80,8 +68,8 @@ const UserReportPage = ({ authUser }) => {
     const pic = reports[i][1].pic;
     const time = reports[i][1].time;
     const date = reports[i][1].date;
+    const description = reports[i][1].description;
     console.log(roomNum + " " + pic);
-    setSnackbar(true);
 
     setDoc(doc(db, "report", "admin", pic, roomNum), {
       reporter: authUser.displayName,
@@ -89,6 +77,7 @@ const UserReportPage = ({ authUser }) => {
       status: "Cancelled",
       time: time,
       date: date,
+      description: description,
     })
       .then(() => {
         setDoc(doc(db, "report", "user", authUser.uid, roomNum), {
@@ -97,6 +86,7 @@ const UserReportPage = ({ authUser }) => {
           status: "Cancelled",
           time: time,
           date: date,
+          description: description,
         });
       })
       .then(() => {
@@ -109,6 +99,7 @@ const UserReportPage = ({ authUser }) => {
             status: "Cancelled",
             time: time,
             date: date,
+            description: description,
           },
         ];
         setReports(temp);
@@ -137,57 +128,25 @@ const UserReportPage = ({ authUser }) => {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
+              <TableCell align="center" />
               <TableCell align="center">Index</TableCell>
               <TableCell align="center">Room Number</TableCell>
               <TableCell align="center">Date</TableCell>
               <TableCell align="center">Time Reported</TableCell>
               <TableCell align="center">Person In Charge</TableCell>
               <TableCell align="center">Status</TableCell>
-              <TableCell align="center"></TableCell>
+              <TableCell align="center" />
             </TableRow>
           </TableHead>
           <TableBody>
             {reports.map((row, i) => {
               return (
-                <TableRow
-                  key={i}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell align="center" component="th" scope="row">
-                    {i + 1}
-                  </TableCell>
-                  <TableCell align="center">{row[0]}</TableCell>
-                  <TableCell align="center">{row[1].date}</TableCell>
-                  <TableCell align="center">{row[1].time}</TableCell>
-                  <TableCell align="center">{row[1].pic}</TableCell>
-                  <TableCell align="center">{row[1].status}</TableCell>
-                  <TableCell align="center">
-                    {row[1].status === "Cancelled" ||
-                    row[1].status === "Resolved" ? (
-                      <IconButton onClick={() => handleDelete(i)} color="error">
-                        <FaTrash size={20} />
-                      </IconButton>
-                    ) : (
-                      <Tooltip title="Cancel">
-                        <IconButton
-                          onClick={() => handleCancel(i)}
-                          color="error"
-                        >
-                          <MdCancel />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {
-                      //Snackbar for cancelling report
-                      <Snackbar
-                        open={snackbar}
-                        autoHideDuration={2000}
-                        onClose={handleCloseSnackBar}
-                        message="Report cancelled."
-                      />
-                    }
-                  </TableCell>
-                </TableRow>
+                <UserReportInfo
+                  row={row}
+                  i={i}
+                  handleDelete={handleDelete}
+                  handleCancel={handleCancel}
+                />
               );
             })}
           </TableBody>

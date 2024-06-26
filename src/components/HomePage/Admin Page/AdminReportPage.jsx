@@ -8,19 +8,20 @@ import {
   deleteDoc,
   setDoc,
 } from "firebase/firestore";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import Snackbar from "@mui/material/Snackbar";
-import { IconButton, Tooltip, LinearProgress } from "@mui/material";
+import {
+  IconButton,
+  LinearProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+} from "@mui/material";
 import { IoIosRefresh } from "react-icons/io";
 import { FaCrow } from "react-icons/fa";
-import { FaCheck } from "react-icons/fa";
-import { FaTrash } from "react-icons/fa";
+import AdminReportInfo from "./AdminReportInfo";
 
 const AdminReportPage = ({ authUser }) => {
   const initialLoad = useRef(false);
@@ -28,21 +29,10 @@ const AdminReportPage = ({ authUser }) => {
   const [reports, setReports] = useState([]);
   const [refresh, setRefresh] = useState(true);
 
-  //Snackbar logic
-  const [snackbar, setSnackbar] = useState(false);
-  function handleCloseSnackBar(event, reason) {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setSnackbar(false);
-  }
-
   //Read report data from Firestore
   const initialized = useRef(false);
   useEffect(() => {
     if (!initialized.current) {
-      initialized.current = true;
       console.log("Reading firestore");
       const reportRef = collection(db, "report", "admin", authUser.displayName);
       const q = query(reportRef);
@@ -60,15 +50,7 @@ const AdminReportPage = ({ authUser }) => {
           initialLoad.current = true;
         });
     }
-  }, [refresh]);
-
-  /*
-  const dbListener = onSnapshot(
-    collection(db, "report", "admin", authUser.displayName),
-    (collection) => {
-      console.log("Something changed");
-    }
-  );*/
+  }, [refresh, authUser.displayName]);
 
   //Force render bypass method from
   //https://stackoverflow.com/questions/30626030/can-you-force-a-react-component-to-rerender-without-calling-setstate
@@ -98,6 +80,7 @@ const AdminReportPage = ({ authUser }) => {
     const userUID = reports[i][1].userUID;
     const time = reports[i][1].time;
     const date = reports[i][1].date;
+    const description = reports[i][1].description;
     console.log(roomNum + " " + userUID);
 
     setDoc(doc(db, "report", "admin", authUser.displayName, roomNum), {
@@ -106,6 +89,7 @@ const AdminReportPage = ({ authUser }) => {
       status: "Resolved",
       time: time,
       date: date,
+      description: description,
     })
       .then(() => {
         setDoc(doc(db, "report", "user", userUID, roomNum), {
@@ -114,6 +98,7 @@ const AdminReportPage = ({ authUser }) => {
           status: "Resolved",
           time: time,
           date: date,
+          description: description,
         });
       })
       .then(() => {
@@ -126,17 +111,17 @@ const AdminReportPage = ({ authUser }) => {
             status: "Resolved",
             time: time,
             date: date,
+            description: description,
           },
         ];
         setReports(temp);
-        setSnackbar(true);
       })
       .then(() => {
         handleClick();
       });
   }
 
-  return !initialLoad.current ? (
+  return !initialLoad.current ? ( //Loading
     <>
       <br />
       <LinearProgress />
@@ -156,6 +141,7 @@ const AdminReportPage = ({ authUser }) => {
         <Table stickyHeader>
           <TableHead>
             <TableRow>
+              <TableCell align="center" />
               <TableCell align="center">Index</TableCell>
               <TableCell align="center">Date</TableCell>
               <TableCell align="center">Time Reported</TableCell>
@@ -168,45 +154,12 @@ const AdminReportPage = ({ authUser }) => {
           <TableBody>
             {reports.map((row, i) => {
               return (
-                <TableRow
-                  key={i}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell align="center" component="th" scope="row">
-                    {i + 1}
-                  </TableCell>
-                  <TableCell align="center">{row[0]}</TableCell>
-                  <TableCell align="center">{row[1].date}</TableCell>
-                  <TableCell align="center">{row[1].time}</TableCell>
-                  <TableCell align="center">{row[1].reporter}</TableCell>
-                  <TableCell align="center">{row[1].status}</TableCell>
-                  <TableCell align="center">
-                    {row[1].status === "Resolved" ||
-                    row[1].status === "Cancelled" ? (
-                      <IconButton onClick={() => handleDelete(i)} color="error">
-                        <FaTrash size={20} />
-                      </IconButton>
-                    ) : (
-                      <Tooltip title="Resolve">
-                        <IconButton
-                          color="success"
-                          onClick={() => handleResolve(i)}
-                        >
-                          <FaCheck size={20} />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {
-                      //Snackbar for resolving report
-                      <Snackbar
-                        open={snackbar}
-                        autoHideDuration={2000}
-                        onClose={handleCloseSnackBar}
-                        message="Report resolved."
-                      />
-                    }
-                  </TableCell>
-                </TableRow>
+                <AdminReportInfo
+                  row={row}
+                  i={i}
+                  handleDelete={handleDelete}
+                  handleResolve={handleResolve}
+                />
               );
             })}
           </TableBody>

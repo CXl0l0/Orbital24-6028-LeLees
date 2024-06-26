@@ -194,14 +194,14 @@ const SignUpForm = () => {
                   onChange={(e) => setSignedUpAs(e.target.id)}
                   required
                 />
-                <label for="user">User</label>
+                <label for="user">Room Occupant</label>
                 <input
                   type="radio"
                   id="administration"
                   name="role"
                   onChange={(e) => setSignedUpAs(e.target.id)}
                 />
-                <label for="administration">Administration</label>
+                <label for="administration">Authority</label>
                 {signedUpAs === "administration" && (
                   <div className="signup-administration">
                     <p>
