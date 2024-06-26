@@ -168,6 +168,7 @@ const AdminDevicePage = () => {
                     variant="filled"
                     id="room-number"
                     helperText={helperText}
+                    inputProps={{ maxLength: 9 }}
                   />
                 ) : (
                   <TextField
@@ -179,6 +180,7 @@ const AdminDevicePage = () => {
                     fullWidth
                     variant="filled"
                     id="room-number"
+                    inputProps={{ maxLength: 9 }}
                   />
                 )}
               </DialogContent>

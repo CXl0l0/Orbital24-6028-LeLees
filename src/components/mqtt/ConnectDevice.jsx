@@ -15,6 +15,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Snackbar,
 } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 
@@ -92,6 +93,11 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
 
   //Report function
   const [reporting, setReporting] = useState(false);
+  const [description, setDescription] = useState("");
+
+  const handleDescription = (event) => {
+    setDescription(event.target.value);
+  };
 
   function handleReport() {
     //Only for user
@@ -110,6 +116,7 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
             status: "Pending",
             time: time,
             date: date,
+            description: description,
           });
           setDoc(doc(db, "report", "admin", pic, roomNum), {
             reporter: authUser.displayName,
@@ -117,12 +124,23 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
             status: "Pending",
             time: time,
             date: date,
+            description: description,
           });
           //emit report event to socket.io server
           socket.emit("reportNotification", authUser.displayName, pic, roomNum);
         }
       });
     }
+  }
+
+  //Snackbar logic
+  const [snackbar, setSnackbar] = useState(false);
+  function handleCloseSnackBar(event, reason) {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setSnackbar(false);
   }
 
   return (
@@ -227,29 +245,52 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
         {
           //Report dialog
           <Dialog open={reporting} onClose={() => setReporting(false)}>
-            <DialogTitle>Reporting to administration</DialogTitle>
+            <DialogTitle>Reporting to the administration</DialogTitle>
             <DialogContent>
               <DialogContentText>
-                You are about to report an issue to the administration. Please
-                illustrate your problem briefly.
+                You are about to report an issue to the administration.
               </DialogContentText>
               <TextField
                 autoFocus
-                required
                 id="description"
                 type="text"
+                label="Please
+                illustrate your problem briefly. (optional)"
                 fullWidth
-                margin="dense"
-                variant="standard"
+                margin="normal"
+                variant="filled"
+                multiline
+                inputProps={{ maxLength: 200 }} //200 characters limit
+                helperText={`${description.length}/200`}
+                onChange={handleDescription}
+                rows={4}
               />
             </DialogContent>
             <DialogActions>
               <Button onClick={() => setReporting(false)}>Cancel</Button>
-              <Button type="submit" onClick={handleReport} color="error">
-                Proceed
+              <Button
+                type="submit"
+                onClick={() => {
+                  handleReport();
+                  setReporting(false);
+                  setSnackbar(true);
+                }}
+                color="error"
+              >
+                Report
               </Button>
             </DialogActions>
           </Dialog>
+          //End of report dialog
+        }
+        {
+          //Snackbar for cancelling report
+          <Snackbar
+            open={snackbar}
+            autoHideDuration={2000}
+            onClose={handleCloseSnackBar}
+            message="Report submitted."
+          />
         }
       </Box>
       <div>

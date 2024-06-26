@@ -169,6 +169,7 @@ const UserDevicePage = ({ authUser }) => {
                     variant="filled"
                     id="room-number"
                     helperText={helperText}
+                    inputProps={{ maxLength: 9 }}
                   />
                 ) : (
                   <TextField
@@ -180,6 +181,7 @@ const UserDevicePage = ({ authUser }) => {
                     fullWidth
                     variant="filled"
                     id="room-number"
+                    inputProps={{ maxLength: 9 }}
                   />
                 )}
               </DialogContent>
