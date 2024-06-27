@@ -143,9 +143,9 @@ const AdminReportPage = ({ authUser }) => {
             <TableRow>
               <TableCell align="center" />
               <TableCell align="center">Index</TableCell>
+              <TableCell align="center">Room Number</TableCell>
               <TableCell align="center">Date</TableCell>
               <TableCell align="center">Time Reported</TableCell>
-              <TableCell align="center">Room Number</TableCell>
               <TableCell align="center">Reporter</TableCell>
               <TableCell align="center">Status</TableCell>
               <TableCell align="center"></TableCell>
