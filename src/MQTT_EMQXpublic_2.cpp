@@ -4,7 +4,7 @@
  * ! 1. The simpler WiFi.h library is used instead of the more extensive WiFiMulti.h
  * ! 2. TCP is encrypted using TLS
  * ! 3. A username and password is used for the ESP32 （client)
- * ! 4. Callback function serial prints everything in the payload rather than the value of the predefined key.
+ * ! 4. Callback function serial prints everything in the payload rather than only the value of the predefined key.
  */
 
 #include <Arduino.h>
@@ -56,7 +56,7 @@ void connectWiFi() {
     WiFi.begin(wifi_ssid, wifi_password);
     Serial.println("");
     Serial.println("Wi-Fi not connected, trying to connect...");
-    while (WiFi.status() != WL_CONNECTED) {    // See WiFiMulti (Blocking).cpp for all returns of the .status method
+    while (WiFi.status() != WL_CONNECTED) {                             // See WiFiMulti (Blocking).cpp for all returns of the .status method
         Serial.println("...");
         delay(500);
     }
@@ -68,18 +68,18 @@ void callback(const char *topic, byte* payload, unsigned int length) {
     Serial.println(topic);
     Serial.print("Message: ");
     for (int i = 0; i < length; i++) {
-        Serial.print((char) payload[i]);    // (char) is a type cast operator that converts the data type of payload[i] to 'char'
+        Serial.print((char) payload[i]);                                // (char) is a type cast operator that converts the data type of payload[i] to 'char'
     }
     Serial.println();
     Serial.println("-----------------------");
 }
 
 void publishMessage() {
-    JsonDocument docP;    // Creates an empty (null) JSON document called 'docP' and store it in the heap. (The estimated maximum number of bytes of each line of {"Sound value":sound} is 24).
-    docP["Sound value"] = sound;    // 'docP' now contains {"Sound value":sound}
+    JsonDocument docP;                                                  // Creates an empty (null) JSON document called 'docP' and store it in the heap. (The estimated maximum number of bytes of each line of {"Sound value":sound} is 24).
+    docP["Sound value"] = sound;                                        // 'docP' now contains {"Sound value":sound}
     char JSONbuffer[50];
-    serializeJson(docP, JSONbuffer);   // To serialise (convert) the JSON object ('docP') into a JSON-encoded string (no spaces, line break, etc.), which can be more easily transmitted and stored, and stores (writes) it to the 'char' buffer 'JSONbuffer'.
-    if (client.publish(publish_topic, JSONbuffer)){    // Returns false if publish failed (connection lost or message too large), true if publish succeeded.
+    serializeJson(docP, JSONbuffer);                                    // To serialise (convert) the JSON object ('docP') into a JSON-encoded string (no spaces, line break, etc.), which can be more easily transmitted and stored, and stores (writes) it to the 'char' buffer 'JSONbuffer'.
+    if (client.publish(publish_topic, JSONbuffer)){                     // Returns false if publish failed (connection lost or message too large), true if publish succeeded.
         Serial.println("----------Publish succeeded----------");
     } else {
         Serial.println("----------Publish failed----------");
@@ -91,15 +91,15 @@ void connectEMQX() {
     net.setCACert(emqx_root_ca);
     client.setServer(EMQX_endpoint, port);
     client.setCallback(callback);
-    while (!client.connected()) {    // Returns false if the client is not connected, true if it is
+    while (!client.connected()) {                                       // Returns false if the client is not connected, true if it is
         String client_id = "esp32-client-";
         client_id += String(WiFi.localIP());    
         Serial.println("Connecting to EMQX...");
-        if (client.connect(client_id.c_str(), username, password)) {  // Connects the client, returns false if connection failed and true if connection succeeded.
+        if (client.connect(client_id.c_str(), username, password)) {    // Connects the client, returns false if connection failed and true if connection succeeded.
             Serial.println("Public EMQX MQTT broker connected");
         } else {
             Serial.print("Connection failed with state ");
-            Serial.print(client.state());    // https://pubsubclient.knolleary.net/api#state
+            Serial.print(client.state());                               // https://pubsubclient.knolleary.net/api#state
             delay(2000);
         }
     }
@@ -107,7 +107,7 @@ void connectEMQX() {
     Serial.print("Subscribing to ");
     Serial.print(subscribe_topic);
     Serial.println(" ...");
-    while (!client.subscribe(subscribe_topic)) {    // Returns true: subscription succeeded, false: subscription failed / connection lost / message is too large
+    while (!client.subscribe(subscribe_topic)) {                        // Returns true: subscription succeeded, false: subscription failed / connection lost / message is too large
         Serial.println("...");                      
         delay(500);
     }
@@ -129,7 +129,7 @@ void loop() {
     }
     
     Serial.println(client.state()); 
-    if (!client.loop()){    // https://pubsubclient.knolleary.net/api#loop
+    if (!client.loop()){                                                // https://pubsubclient.knolleary.net/api#loop
         Serial.println(client.state());
         connectEMQX();    
     }   
@@ -139,5 +139,5 @@ void loop() {
     Serial.println(sound);
 
     publishMessage();
-    delay(250);
+    delay(100);
 }
