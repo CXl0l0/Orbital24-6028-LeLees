@@ -29,7 +29,7 @@ ChartJS.register(
   LinearScale
 );
 
-const SoundVisualizer = ({ decibel }) => {
+const SoundVisualizer = ({ voltage }) => {
   const [barData, setBarData] = useState({
     labels: [],
     datasets: [
@@ -60,7 +60,7 @@ const SoundVisualizer = ({ decibel }) => {
     scales: {
       y: {
         min: 0,
-        max: 4096,
+        max: 5,
       },
       x: {},
     },
@@ -70,7 +70,7 @@ const SoundVisualizer = ({ decibel }) => {
     const updateBar = () => {
       setBarData((prevData) => {
         const labels = [...prevData.labels, new Date().toLocaleTimeString()];
-        const data = [...prevData.datasets[0].data, decibel];
+        const data = [...prevData.datasets[0].data, voltage];
 
         if (labels.length > 60) {
           labels.shift();
@@ -92,7 +92,7 @@ const SoundVisualizer = ({ decibel }) => {
     const updateLine = () => {
       setLineData((prevData) => {
         const labels = [...prevData.labels, new Date().toLocaleTimeString()];
-        const data = [...prevData.datasets[0].data, decibel];
+        const data = [...prevData.datasets[0].data, voltage];
 
         if (labels.length > 60) {
           labels.shift();
@@ -119,7 +119,7 @@ const SoundVisualizer = ({ decibel }) => {
       clearInterval(barInterval);
       clearInterval(lineInterval);
     };
-  }, [decibel]);
+  }, [voltage]);
 
   return (
     <>

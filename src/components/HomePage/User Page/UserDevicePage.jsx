@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getDoc, doc } from "firebase/firestore";
 import { db } from "../../../firebase/firebase";
 import { IconButton } from "@mui/material";
@@ -35,6 +35,25 @@ const UserDevicePage = ({ authUser }) => {
   const [helperText, setHelperText] = useState("");
   const [deviceBoard, setDeviceBoard] = useState(null);
   const [devices, setDevices] = useState([]);
+
+  //Local storage logic for device card
+  const initialized = useRef(false);
+  useEffect(() => {
+    if (!initialized.current) {
+      const devices = JSON.parse(
+        localStorage.getItem(authUser.uid + "_devices")
+      );
+      if (devices) {
+        setDevices(devices);
+        initialized.current = true;
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("Setting storage to: " + devices);
+    localStorage.setItem(authUser.uid + "_devices", JSON.stringify(devices));
+  }, [devices]);
 
   function handleRemoveDevice() {
     setDevices([

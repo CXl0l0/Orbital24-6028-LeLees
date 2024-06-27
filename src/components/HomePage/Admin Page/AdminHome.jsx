@@ -254,7 +254,7 @@ export const AdminHome = () => {
                     <CreateDevicePage />
                   </TabPanel>
                   <TabPanel value="addDeviceTab">
-                    <AdminDevicePage />
+                    <AdminDevicePage authUser={authUser} />
                   </TabPanel>
                   <TabPanel value="reportsTab">
                     <AdminReportPage authUser={authUser} />

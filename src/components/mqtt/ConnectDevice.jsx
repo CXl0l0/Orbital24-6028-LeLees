@@ -298,15 +298,15 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
         <br />
         Topic subscribed: {topic}
         <br />
-        Message received: <br />
-        {payload.toString()}
+        Raw Digital Value: {payload.toString()} <br />
+        Voltage value: {((payload / 4095) * 5).toFixed(3)}V / 5V
       </div>
-
+      <br />
       <Box>
         {status === "Subscribed" && (
           <>
-            <SoundBar decibel={payload} />
-            <SoundVisualizer decibel={payload} />
+            <SoundBar soundData={payload} />
+            <SoundVisualizer voltage={((payload / 4095) * 5).toFixed(3)} />
           </>
         )}
       </Box>

@@ -3,12 +3,12 @@ import React from "react";
 import { useEffect } from "react";
 import "./SoundBar.css";
 
-const SoundBar = ({ decibel }) => {
+const SoundBar = ({ soundData }) => {
   useEffect(() => {
     var bars = document.getElementsByClassName("bar");
     const len = bars.length;
     for (var i = 0; i < len; i++) {
-      if (decibel / (4096 / bars.length) > i) {
+      if (soundData / (4096 / bars.length) > i) {
         bars[i].classList.add("on");
       } else {
         bars[i].classList.remove("on");

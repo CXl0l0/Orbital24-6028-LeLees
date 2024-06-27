@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getDoc, doc } from "firebase/firestore";
 import { db } from "../../../firebase/firebase";
 import { IconButton } from "@mui/material";
@@ -25,7 +25,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const AdminDevicePage = () => {
+const AdminDevicePage = ({ authUser }) => {
   const [deviceBoard, setDeviceBoard] = useState(false);
   const [addingDevice, setAddingDevice] = useState(false);
   const [removingDevice, setRemovingDevice] = useState(false);
@@ -34,6 +34,25 @@ const AdminDevicePage = () => {
   const [targetRemovalDevice, setTargetRemovalDevice] = useState(null);
   const [helperText, setHelperText] = useState("");
   const [devices, setDevices] = useState([]);
+
+  //Local storage logic for device card
+  const initialized = useRef(false);
+  useEffect(() => {
+    if (!initialized.current) {
+      const devices = JSON.parse(
+        localStorage.getItem(authUser.uid + "_devices")
+      );
+      if (devices) {
+        setDevices(devices);
+        initialized.current = true;
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("Setting storage to: " + devices);
+    localStorage.setItem(authUser.uid + "_devices", JSON.stringify(devices));
+  }, [devices]);
 
   function handleRemoveDevice() {
     setDevices([
