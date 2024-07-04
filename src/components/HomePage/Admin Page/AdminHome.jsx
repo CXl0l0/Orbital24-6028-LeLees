@@ -33,7 +33,7 @@ import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
 import AdminDevicePage from "./AdminDevicePage";
-import CreateDevicePage from "./CreateDevicePage";
+import ManageDevicePage from "./ManageDevicePage";
 
 export const AdminHome = () => {
   //Tab name
@@ -245,13 +245,13 @@ export const AdminHome = () => {
                 <TabContext value={tabValue}>
                   <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                     <TabList onChange={handleTabChange} centered>
-                      <Tab label="Create Device" value="createDeviceTab" />
+                      <Tab label="Manage Device" value="manageDeviceTab" />
                       <Tab label="Devices" value="addDeviceTab" />
                       <Tab label="Reports" value="reportsTab" />
                     </TabList>
                   </Box>
-                  <TabPanel value="createDeviceTab">
-                    <CreateDevicePage />
+                  <TabPanel value="manageDeviceTab">
+                    <ManageDevicePage />
                   </TabPanel>
                   <TabPanel value="addDeviceTab">
                     <AdminDevicePage authUser={authUser} />
