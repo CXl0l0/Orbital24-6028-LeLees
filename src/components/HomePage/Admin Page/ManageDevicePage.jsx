@@ -6,6 +6,7 @@ import {
   getDocs,
   setDoc,
   doc,
+  deleteDoc,
 } from "firebase/firestore";
 import {
   TextField,
@@ -113,9 +114,36 @@ const ManageDevicePage = () => {
   //End of create device logic
 
   //Delete device logic
+  const [deleteDevice, setDeleteDevice] = useState(null);
+  const [deletedDevice, setDeletedDevice] = useState(false);
+  function handleCloseDeletedDeviceSnackbar(event, reason) {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setDeletedDevice(false);
+  }
+
   function handleDeleteDevice(e) {
     e.preventDefault();
-    console.log("Deleting device...");
+    setError(null);
+    console.log("Checking validity...");
+    if (deleteDevice === null) {
+      //User didnt select a device to be deleted
+      console.log("Please select a device to be deleted");
+      setError("Delete device");
+    } else {
+      console.log("Deleting device...");
+      console.log(deleteDevice);
+      deleteDoc(doc(db, "devices", deleteDevice))
+        .then(() => {
+          console.log("Deleted device");
+          setDeletedDevice(true);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    }
   }
   //End of delete device logic
 
@@ -179,6 +207,8 @@ const ManageDevicePage = () => {
             Create Device
           </Button>
         </Box>
+      </form>
+      <form onSubmit={handleDeleteDevice}>
         <Box
           sx={{ "& > :not(style)": { m: 1, width: "25ch" } }}
           noValidate
@@ -188,6 +218,9 @@ const ManageDevicePage = () => {
             disablePortal
             id="delete-device"
             options={devices}
+            onChange={(event, value) => {
+              setDeleteDevice(value);
+            }}
             renderInput={(params) => (
               <TextField {...params} label="Delete A Device" />
             )}
@@ -226,6 +259,34 @@ const ManageDevicePage = () => {
               sx={{ width: "100%" }}
             >
               Please select a person in charge.
+            </Alert>
+          </Snackbar>
+          <Snackbar //Device to be deleted not selected
+            autoHideDuration={4000}
+            onClose={handleCloseSnackBar}
+            open={error === "Delete device"}
+          >
+            <Alert
+              onClose={handleCloseSnackBar}
+              severity="error"
+              variant="filled"
+              sx={{ width: "100%" }}
+            >
+              Please select a device to be deleted.
+            </Alert>
+          </Snackbar>
+          <Snackbar //Successfully deleted device
+            autoHideDuration={4000}
+            open={deletedDevice}
+            onClose={handleCloseDeletedDeviceSnackbar}
+          >
+            <Alert
+              onClose={handleCloseDeletedDeviceSnackbar}
+              severity="success"
+              variant="filled"
+              sx={{ width: "100%" }}
+            >
+              Successfully deleted device.
             </Alert>
           </Snackbar>
           <Snackbar //Successfully created device
