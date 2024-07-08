@@ -47,19 +47,24 @@ function LoginForm() {
         .then(() => {
           setError(false);
           setVerified(auth.currentUser.emailVerified);
-          console.log(auth.currentUser.email);
-          console.log(auth.currentUser.emailVerified);
           setUserSignedIn(true);
-          getDoc(doc(db, "accounts", auth.currentUser.uid)).then((userSnap) => {
-            const role = userSnap.data().role;
-            if (role === "user") {
-              console.log("user");
-              navigate("/userHome");
-            } else if (role === "administration") {
-              console.log("administration");
-              navigate("/adminHome");
-            }
-          });
+        })
+        .then(() => {
+          if (auth.currentUser.emailVerified) {
+            console.log("Signing in");
+            getDoc(doc(db, "accounts", auth.currentUser.uid)).then(
+              (userSnap) => {
+                const role = userSnap.data().role;
+                if (role === "user") {
+                  console.log("user");
+                  navigate("/userHome");
+                } else if (role === "administration") {
+                  console.log("administration");
+                  navigate("/adminHome");
+                }
+              }
+            );
+          }
         })
         .catch((error) => {
           console.log(error);

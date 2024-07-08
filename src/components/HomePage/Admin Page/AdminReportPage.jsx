@@ -18,6 +18,14 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  DialogContentText,
+  TextField,
+  Snackbar,
 } from "@mui/material";
 import { IoIosRefresh } from "react-icons/io";
 import { FaCrow } from "react-icons/fa";
@@ -74,6 +82,11 @@ const AdminReportPage = ({ authUser }) => {
     );
   }
 
+  //Resolving logic
+  const [resolving, setResolving] = useState(false);
+  const [comment, setComment] = useState("");
+  const [resolveTarget, setResolveTarget] = useState(null);
+
   function handleResolve(i) {
     const roomNum = reports[i][0];
     const reporter = reports[i][1].reporter;
@@ -90,6 +103,7 @@ const AdminReportPage = ({ authUser }) => {
       time: time,
       date: date,
       description: description,
+      comment: comment,
     })
       .then(() => {
         setDoc(doc(db, "report", "user", userUID, roomNum), {
@@ -99,6 +113,7 @@ const AdminReportPage = ({ authUser }) => {
           time: time,
           date: date,
           description: description,
+          comment: comment,
         });
       })
       .then(() => {
@@ -112,6 +127,7 @@ const AdminReportPage = ({ authUser }) => {
             time: time,
             date: date,
             description: description,
+            comment: comment,
           },
         ];
         setReports(temp);
@@ -119,6 +135,16 @@ const AdminReportPage = ({ authUser }) => {
       .then(() => {
         handleClick();
       });
+  }
+
+  //Snackbar logic
+  const [snackbar, setSnackbar] = useState(false);
+  function handleCloseSnackBar(event, reason) {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setSnackbar(false);
   }
 
   return !initialLoad.current ? ( //Loading
@@ -158,13 +184,64 @@ const AdminReportPage = ({ authUser }) => {
                   row={row}
                   i={i}
                   handleDelete={handleDelete}
-                  handleResolve={handleResolve}
+                  handleResolve={() => {
+                    setResolving(true);
+                    setResolveTarget(i);
+                  }}
                 />
               );
             })}
           </TableBody>
+          {
+            //Resolving dialog
+            <Dialog open={resolving} onClose={() => setResolving(false)}>
+              <DialogTitle>Resolving</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  Please enter a brief resolve comment for the report.
+                </DialogContentText>
+                <TextField
+                  autoFocus
+                  id="comment"
+                  type="text"
+                  label="Please enter your report comment here."
+                  fullWidth
+                  margin="normal"
+                  variant="filled"
+                  multiline
+                  inputProps={{ maxLength: 200 }} //200 characters limit
+                  helperText={`${comment.length}/200`}
+                  onChange={(e) => setComment(e.target.value)}
+                  rows={4}
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setResolving(false)}>Cancel</Button>
+                <Button
+                  type="submit"
+                  onClick={() => {
+                    handleResolve(resolveTarget);
+                    setResolving(false);
+                    setSnackbar(true);
+                  }}
+                >
+                  Resolve
+                </Button>
+              </DialogActions>
+            </Dialog>
+            //End of Adding Device's dialog
+          }
         </Table>
       </TableContainer>
+      {
+        //Snackbar for resolving report
+        <Snackbar
+          open={snackbar}
+          autoHideDuration={2000}
+          onClose={handleCloseSnackBar}
+          message="Report resolved."
+        />
+      }
       <br />
       {reports.length === 0 && (
         <center>

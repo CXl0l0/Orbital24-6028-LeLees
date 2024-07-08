@@ -91,6 +91,14 @@ const UserReportInfo = ({ row, i, handleDelete, handleCancel }) => {
               </Typography>
               <p>{row[1].description}</p>
             </Box>
+            {row[1].comment !== undefined && (
+              <Box sx={{ margin: 1, marginBottom: 2 }}>
+                <Typography variant="h6" gutterBottom component="div">
+                  Resolve Comment
+                </Typography>
+                <p>{row[1].comment}</p>
+              </Box>
+            )}
           </Collapse>
         </TableCell>
       </TableRow>

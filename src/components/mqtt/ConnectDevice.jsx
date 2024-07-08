@@ -49,6 +49,14 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
         setPayload(soundValue);
       });
     }
+
+    return () => {
+      if (client) {
+        client.end(() => {
+          console.log("Dismounting connect device page");
+        });
+      }
+    };
   }, [client]);
 
   function handleConnect() {
@@ -183,7 +191,7 @@ const ConnectDevice = ({ deviceName, role, authUser, roomNum }) => {
               Disconnect
             </Button>
           ) : status === "Disconnecting" ? (
-            //Status connecting
+            //Status disconnecting
             <LoadingButton
               loadingIndicator="Disconnecting..."
               loading={status === "Disconnecting"}

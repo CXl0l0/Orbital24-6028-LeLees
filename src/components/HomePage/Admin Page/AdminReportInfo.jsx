@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   IconButton,
   Tooltip,
   TableCell,
   TableRow,
-  Snackbar,
   Collapse,
   Box,
   Typography,
@@ -17,15 +16,6 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 const AdminReportInfo = ({ row, i, handleDelete, handleResolve }) => {
   const [openDescription, setOpenDescription] = useState(false);
 
-  //Snackbar logic
-  const [snackbar, setSnackbar] = useState(false);
-  function handleCloseSnackBar(event, reason) {
-    if (reason === "clickaway") {
-      return;
-    }
-
-    setSnackbar(false);
-  }
   return (
     <>
       <TableRow
@@ -63,33 +53,31 @@ const AdminReportInfo = ({ row, i, handleDelete, handleResolve }) => {
                 color="success"
                 onClick={() => {
                   handleResolve(i);
-                  setSnackbar(true);
                 }}
               >
                 <FaCheck size={20} />
               </IconButton>
             </Tooltip>
           )}
-          {
-            //Snackbar for resolving report
-            <Snackbar
-              open={snackbar}
-              autoHideDuration={2000}
-              onClose={handleCloseSnackBar}
-              message="Report resolved."
-            />
-          }
         </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
           <Collapse in={openDescription} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
+            <Box sx={{ margin: 1, marginBottom: 2 }}>
               <Typography variant="h6" gutterBottom component="div">
                 Description
               </Typography>
               <p>{row[1].description}</p>
             </Box>
+            {row[1].comment !== undefined && (
+              <Box sx={{ margin: 1, marginBottom: 2 }}>
+                <Typography variant="h6" gutterBottom component="div">
+                  Resolve Comment
+                </Typography>
+                <p>{row[1].comment}</p>
+              </Box>
+            )}
           </Collapse>
         </TableCell>
       </TableRow>
