@@ -17,9 +17,8 @@ import {
   Alert,
 } from "@mui/material";
 import { db } from "../../../firebase/firebase";
-import { create } from "@mui/material/styles/createTransitions";
 
-const ManageDevicePage = () => {
+const ManageDevicePage = ({ authUser }) => {
   const [deviceName, setDeviceName] = useState("");
   const [roomNumber, setRoomNumber] = useState("");
   const [pic, setPic] = useState(null);
@@ -136,6 +135,20 @@ const ManageDevicePage = () => {
       console.log("Deleting device...");
       console.log(deleteDevice);
       deleteDoc(doc(db, "devices", deleteDevice))
+        .then(() => {
+          //Remove deleted device from device page (if added)
+          console.log("Removing the deleted device from device page");
+          const beforeDelete = JSON.parse(
+            localStorage.getItem(authUser.uid + "_devices")
+          );
+          const afterDelete = beforeDelete.filter((device) => {
+            return device[1] !== deleteDevice;
+          });
+          localStorage.setItem(
+            authUser.uid + "_devices",
+            JSON.stringify(afterDelete)
+          );
+        })
         .then(() => {
           console.log("Deleted device");
           setDeletedDevice(true);

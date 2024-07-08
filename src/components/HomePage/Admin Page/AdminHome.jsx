@@ -251,7 +251,7 @@ export const AdminHome = () => {
                     </TabList>
                   </Box>
                   <TabPanel value="manageDeviceTab">
-                    <ManageDevicePage />
+                    <ManageDevicePage authUser={authUser} />
                   </TabPanel>
                   <TabPanel value="addDeviceTab">
                     <AdminDevicePage authUser={authUser} />
