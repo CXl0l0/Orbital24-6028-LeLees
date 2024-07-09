@@ -43,6 +43,7 @@ const UserDevicePage = ({ authUser }) => {
       const devices = JSON.parse(
         localStorage.getItem(authUser.uid + "_devices")
       );
+
       if (devices) {
         setDevices(devices);
         initialized.current = true;
@@ -51,9 +52,27 @@ const UserDevicePage = ({ authUser }) => {
   }, []);
 
   useEffect(() => {
+    refreshDevices();
     console.log("Setting storage to: " + devices);
     localStorage.setItem(authUser.uid + "_devices", JSON.stringify(devices));
   }, [devices]);
+
+  const refreshDevices = async () => {
+    devices.forEach(async (device1) => {
+      const ref = doc(db, "devices", device1[1]);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        console.log(device1[1] + " exists in db");
+      } else {
+        console.log(device1[1] + " doesnt exists in db");
+        setDevices(
+          devices.filter((device2) => {
+            return device1[1] !== device2[1];
+          })
+        );
+      }
+    });
+  };
 
   function handleRemoveDevice() {
     setDevices([
