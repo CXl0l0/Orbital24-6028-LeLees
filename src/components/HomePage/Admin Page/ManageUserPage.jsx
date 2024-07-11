@@ -108,7 +108,7 @@ const ManageUserPage = ({ authUser }) => {
   }
 
   //Edit user logic
-  const [targetUser, setTargetUser] = useState([]);
+  const [targetUser, setTargetUser] = useState(null);
   const [targetUserAccess, setTargetUserAccess] = useState([]);
 
   function chooseTargetUser(user) {
@@ -118,7 +118,7 @@ const ManageUserPage = ({ authUser }) => {
     getDocs(accessRef)
       .then((snapshot) => [
         snapshot.forEach((doc) => {
-          temp.push([doc.id]);
+          temp.push(doc.id);
         }),
       ])
       .then(() => {

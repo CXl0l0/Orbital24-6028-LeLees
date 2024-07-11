@@ -58,6 +58,7 @@ const UserDevicePage = ({ authUser }) => {
   }, [devices]);
 
   const refreshDevices = async () => {
+    //Check if device still exists
     devices.forEach(async (device1) => {
       const ref = doc(db, "devices", device1[1]);
       const snap = await getDoc(ref);

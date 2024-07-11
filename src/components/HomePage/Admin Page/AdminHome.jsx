@@ -247,7 +247,7 @@ export const AdminHome = () => {
                   <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
                     <TabList onChange={handleTabChange} centered>
                       <Tab label="Manage Device" value="manageDeviceTab" />
-                      <Tab label="Manage User" value="manageUserTab" />
+                      <Tab label="Manage User Access" value="manageUserTab" />
                       <Tab label="Devices" value="addDeviceTab" />
                       <Tab label="Reports" value="reportsTab" />
                     </TabList>
