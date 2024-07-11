@@ -204,7 +204,7 @@ const AdminReportPage = ({ authUser }) => {
                   autoFocus
                   id="comment"
                   type="text"
-                  label="Please enter your report comment here."
+                  label="Please enter your resolve comment here."
                   fullWidth
                   margin="normal"
                   variant="filled"
