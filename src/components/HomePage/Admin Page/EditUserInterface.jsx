@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useReducer } from "react";
 import {
   Box,
   Container,
@@ -6,9 +6,12 @@ import {
   ListItem,
   ListItemText,
   ListSubheader,
+  ListItemButton,
   Autocomplete,
   TextField,
   Button,
+  Divider,
+  IconButton,
 } from "@mui/material";
 import {
   collection,
@@ -19,16 +22,17 @@ import {
   doc,
   deleteDoc,
 } from "firebase/firestore";
+import { IoIosRefresh } from "react-icons/io";
 import { db } from "../../../firebase/firebase";
 
 const EditUserInterface = ({ targetUser, targetUserAccess }) => {
+  const [refresh, setRefresh] = useState(true);
   const [devicesInfo, setDevicesInfo] = useState([]);
-  const [targetRoom, setTargetRoom] = useState(null);
-
   //Obtain available rooms from database
   const initializedAccount = useRef(false);
   useEffect(() => {
     if (!initializedAccount.current) {
+      console.log("Refreshing");
       const deviceRef = collection(db, "devices");
       var temp = [];
       getDocs(deviceRef)
@@ -38,33 +42,65 @@ const EditUserInterface = ({ targetUser, targetUserAccess }) => {
           });
         })
         .then(() => {
+          console.log("Setting device info");
           setDevicesInfo(temp);
         })
         .then(() => {
           initializedAccount.current = true;
         });
     }
-  }, []);
+  }, [refresh]);
 
   //Add access logic
+  const [targetRoom, setTargetRoom] = useState(null);
+  //Snackbar
+  const [addedAccess, setAddedAccess] = useState(false);
+
   function addAccess() {
     console.log("Adding access");
     const uid = targetUser[0];
     setDoc(doc(db, "accounts", uid, "access", targetRoom), {
       dummy: "field",
-    }).then(() => {
-      console.log("Done adding access to user " + targetUser[1].username);
-    });
+    })
+      .then(() => {
+        console.log("Done adding access to user " + targetUser[1].username);
+        setTargetRoom(null);
+      })
+      .then(() => {});
   }
 
   //Remove access logic
+  const [removalTarget, setRemovalTarget] = useState(null);
+  //Snackbar
+  const [removedAccess, setRemovedAccess] = useState(false);
+
   function removeAccess() {
-    console.log("Removing access");
+    console.log("Removing access of " + removalTarget);
+    const uid = targetUser[0];
+    deleteDoc(doc(db, "accounts", uid, "access", removalTarget)).then(() => {
+      console.log("Done removing access of " + removalTarget);
+      setRemovalTarget(null);
+    });
   }
+
+  //Ensure the subtargets is refreshed everytime the targetUser changed
+  useEffect(() => {
+    setTargetRoom(null);
+    setRemovalTarget(null);
+  }, [targetUser, targetUserAccess]);
 
   return (
     <>
       <Box>
+        <IconButton
+          onClick={() => {
+            //Refresh
+            initializedAccount.current = false;
+            setRefresh(!refresh);
+          }}
+        >
+          <IoIosRefresh />
+        </IconButton>
         <Container>
           <h1>Edit User Access</h1>
           <h2>Target User: {targetUser && targetUser[1]?.username}</h2>
@@ -76,6 +112,8 @@ const EditUserInterface = ({ targetUser, targetUserAccess }) => {
             height: 300,
             maxWidth: 360,
             bgcolor: "background.paper",
+            border: 1,
+            margin: 2,
           }}
         >
           <List
@@ -85,7 +123,6 @@ const EditUserInterface = ({ targetUser, targetUserAccess }) => {
               position: "relative",
               overflow: "auto",
               maxHeight: 260,
-              "& ul": { padding: 0 },
             }}
             subheader={<li />}
           >
@@ -98,9 +135,16 @@ const EditUserInterface = ({ targetUser, targetUserAccess }) => {
                   <ListItem>None</ListItem>
                 ) : (
                   targetUserAccess.map((roomNum) => (
-                    <ListItem key={`room-${roomNum}`}>
-                      <ListItemText primary={`Room ${roomNum}`} />
-                    </ListItem>
+                    <>
+                      <ListItemButton
+                        onClick={() => setRemovalTarget(roomNum)}
+                        key={`room-${roomNum}`}
+                        selected={removalTarget === roomNum}
+                      >
+                        <ListItemText primary={`Room ${roomNum}`} />
+                      </ListItemButton>
+                      <Divider />
+                    </>
                   ))
                 )}
               </ul>
@@ -108,6 +152,30 @@ const EditUserInterface = ({ targetUser, targetUserAccess }) => {
           </List>
         </Container>
         <Container>
+          {removalTarget ? (
+            <Button
+              variant="contained"
+              size="medium"
+              type="submit"
+              color="error"
+              onClick={removeAccess}
+            >
+              Remove Access
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              size="medium"
+              type="submit"
+              color="error"
+              disabled
+            >
+              Remove access
+            </Button>
+          )}
+        </Container>
+        <Container>
+          <br />
           {targetUser && (
             <>
               <Autocomplete
