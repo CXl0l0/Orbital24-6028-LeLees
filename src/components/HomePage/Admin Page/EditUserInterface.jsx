@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useReducer } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Box,
   Container,
@@ -11,22 +11,23 @@ import {
   TextField,
   Button,
   Divider,
-  IconButton,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   collection,
-  query,
-  where,
   getDocs,
   setDoc,
   doc,
   deleteDoc,
 } from "firebase/firestore";
-import { IoIosRefresh } from "react-icons/io";
 import { db } from "../../../firebase/firebase";
 
-const EditUserInterface = ({ targetUser, targetUserAccess }) => {
-  const [refresh, setRefresh] = useState(true);
+const EditUserInterface = ({
+  targetUser,
+  targetUserAccess,
+  refreshUserAccess,
+}) => {
   const [devicesInfo, setDevicesInfo] = useState([]);
   //Obtain available rooms from database
   const initializedAccount = useRef(false);
@@ -49,7 +50,7 @@ const EditUserInterface = ({ targetUser, targetUserAccess }) => {
           initializedAccount.current = true;
         });
     }
-  }, [refresh]);
+  }, []);
 
   //Add access logic
   const [targetRoom, setTargetRoom] = useState(null);
@@ -66,7 +67,10 @@ const EditUserInterface = ({ targetUser, targetUserAccess }) => {
         console.log("Done adding access to user " + targetUser[1].username);
         setTargetRoom(null);
       })
-      .then(() => {});
+      .then(() => {
+        refreshUserAccess();
+        setAddedAccess(true);
+      });
   }
 
   //Remove access logic
@@ -77,10 +81,25 @@ const EditUserInterface = ({ targetUser, targetUserAccess }) => {
   function removeAccess() {
     console.log("Removing access of " + removalTarget);
     const uid = targetUser[0];
-    deleteDoc(doc(db, "accounts", uid, "access", removalTarget)).then(() => {
-      console.log("Done removing access of " + removalTarget);
-      setRemovalTarget(null);
-    });
+    deleteDoc(doc(db, "accounts", uid, "access", removalTarget))
+      .then(() => {
+        console.log("Done removing access of " + removalTarget);
+        setRemovalTarget(null);
+      })
+      .then(() => {
+        refreshUserAccess();
+        setRemovedAccess(true);
+      });
+  }
+
+  //Close snackbar function
+  function handleCloseSnackbar(event, reason) {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setRemovedAccess(false);
+    setAddedAccess(false);
   }
 
   //Ensure the subtargets is refreshed everytime the targetUser changed
@@ -92,15 +111,6 @@ const EditUserInterface = ({ targetUser, targetUserAccess }) => {
   return (
     <>
       <Box>
-        <IconButton
-          onClick={() => {
-            //Refresh
-            initializedAccount.current = false;
-            setRefresh(!refresh);
-          }}
-        >
-          <IoIosRefresh />
-        </IconButton>
         <Container>
           <h1>Edit User Access</h1>
           <h2>Target User: {targetUser && targetUser[1]?.username}</h2>
@@ -131,7 +141,9 @@ const EditUserInterface = ({ targetUser, targetUserAccess }) => {
                 <ListSubheader sx={{ padding: "2px" }}>
                   This user have the following rooms' access:
                 </ListSubheader>
-                {targetUserAccess.length === 0 ? ( //No room access at all
+                {targetUserAccess === "Loading" ? ( //Loading
+                  <ListItem>Loading...</ListItem>
+                ) : targetUserAccess.length === 0 ? ( //No room access at all
                   <ListItem>None</ListItem>
                 ) : (
                   targetUserAccess.map((roomNum) => (
@@ -173,6 +185,23 @@ const EditUserInterface = ({ targetUser, targetUserAccess }) => {
               Remove access
             </Button>
           )}
+          {
+            //Snackbar for remove access
+            <Snackbar
+              open={removedAccess}
+              autoHideDuration={4000}
+              onClose={handleCloseSnackbar}
+            >
+              <Alert
+                onClose={handleCloseSnackbar}
+                severity="success"
+                variant="filled"
+                sx={{ width: "100%" }}
+              >
+                Successfully removed access.
+              </Alert>
+            </Snackbar>
+          }
         </Container>
         <Container>
           <br />
@@ -230,6 +259,23 @@ const EditUserInterface = ({ targetUser, targetUserAccess }) => {
                   Add
                 </Button>
               )}
+              {
+                //Snackbar for add access
+                <Snackbar
+                  open={addedAccess}
+                  autoHideDuration={4000}
+                  onClose={handleCloseSnackbar}
+                >
+                  <Alert
+                    onClose={handleCloseSnackbar}
+                    severity="success"
+                    variant="filled"
+                    sx={{ width: "100%" }}
+                  >
+                    Successfully added access.
+                  </Alert>
+                </Snackbar>
+              }
             </>
           )}
         </Container>

@@ -1,15 +1,6 @@
-import { useEffect, useRef, useState, useReducer } from "react";
+import { useEffect, useRef, useState } from "react";
 import { db } from "../../../firebase/firebase";
-import {
-  doc,
-  collection,
-  getDocs,
-  query,
-  deleteDoc,
-  setDoc,
-  where,
-  limit,
-} from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import {
   IconButton,
   LinearProgress,
@@ -22,20 +13,10 @@ import {
   TableFooter,
   TablePagination,
   Paper,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  DialogContentText,
-  TextField,
-  Snackbar,
   styled,
   tableCellClasses,
   Box,
-  Tab,
   Container,
-  Checkbox,
 } from "@mui/material";
 import { IoIosRefresh } from "react-icons/io";
 import EditUserInterface from "./EditUserInterface";
@@ -49,16 +30,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
-  },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-  // hide last border
-  "&:last-child td, &:last-child th": {
-    border: 0,
   },
 }));
 
@@ -113,6 +84,7 @@ const ManageUserPage = ({ authUser }) => {
 
   function chooseTargetUser(user) {
     setTargetUser(user);
+    setTargetUserAccess("Loading");
     const accessRef = collection(db, "accounts", user[0], "access");
     var temp = [];
     getDocs(accessRef)
@@ -162,33 +134,26 @@ const ManageUserPage = ({ authUser }) => {
                   : users
                 ).map((user, i) => {
                   return (
-                    <StyledTableRow
+                    <TableRow
                       key={i}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                      sx={{
+                        "&:last-child td, &:last-child th": { border: 0 },
+                        cursor: "pointer",
+                      }}
                       onClick={() => chooseTargetUser(user)}
+                      hover
+                      selected={targetUser === user}
                     >
-                      <StyledTableCell
-                        align="center"
-                        component="th"
-                        scope="row"
-                      >
+                      <TableCell align="center" component="th" scope="row">
                         {i + 1 + page * rowsPerPage}
-                      </StyledTableCell>
-                      <StyledTableCell
-                        align="center"
-                        component="th"
-                        scope="row"
-                      >
+                      </TableCell>
+                      <TableCell align="center" component="th" scope="row">
                         {user[1].username}
-                      </StyledTableCell>
-                      <StyledTableCell
-                        align="center"
-                        component="th"
-                        scope="row"
-                      >
+                      </TableCell>
+                      <TableCell align="center" component="th" scope="row">
                         User
-                      </StyledTableCell>
-                    </StyledTableRow>
+                      </TableCell>
+                    </TableRow>
                   );
                 })}
               </TableBody>
@@ -213,6 +178,7 @@ const ManageUserPage = ({ authUser }) => {
           <EditUserInterface
             targetUser={targetUser}
             targetUserAccess={targetUserAccess}
+            refreshUserAccess={() => chooseTargetUser(targetUser)}
           />
         </Container>
       </Box>

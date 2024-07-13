@@ -62,10 +62,26 @@ const UserDevicePage = ({ authUser }) => {
     devices.forEach(async (device1) => {
       const ref = doc(db, "devices", device1[1]);
       const snap = await getDoc(ref);
-      if (snap.exists()) {
-        console.log(device1[1] + " exists in db");
-      } else {
+      if (!snap.exists()) {
         console.log(device1[1] + " doesnt exists in db");
+        setDevices(
+          devices.filter((device2) => {
+            return device1[1] !== device2[1];
+          })
+        );
+      }
+    });
+    //Check if user still have permission to view certain devices
+    devices.forEach(async (device1) => {
+      const ref = doc(
+        db,
+        "accounts",
+        authUser.uid,
+        "access",
+        device1[1].toString()
+      );
+      const snap = await getDoc(ref);
+      if (!snap.exists()) {
         setDevices(
           devices.filter((device2) => {
             return device1[1] !== device2[1];
@@ -98,40 +114,61 @@ const UserDevicePage = ({ authUser }) => {
     e.preventDefault();
     const roomNum = document.getElementById("room-number").value;
     console.log("Entered room number: " + roomNum);
-    if (!isNaN(+roomNum) && roomNum !== "") {
-      const deviceRef = doc(db, "devices", roomNum.toString());
-      //valid input (is number)
-      getDoc(deviceRef).then((deviceSnap) => {
-        if (deviceSnap.exists()) {
-          //Check if already added the device
-          const oldlen = devices.length;
-          const newlen = devices.filter((device) => {
-            return device[1] !== roomNum;
-          }).length;
+    const permissionRef = doc(
+      db,
+      "accounts",
+      authUser.uid,
+      "access",
+      roomNum.toString()
+    );
 
-          if (newlen === oldlen) {
-            setAddingDevice(false);
-            //array of devices which is stored in array of size 2
-            //device[0] represents deviceName and device[1] represents roomNum
-            setDevices([...devices, [deviceSnap.data().deviceName, roomNum]]);
-          } else {
-            console.log("Already added this device");
-            setInvalidRoomNumber(true);
-            setHelperText("Already added this device");
-          }
+    getDoc(permissionRef).then((snapshot) => {
+      if (snapshot.exists()) {
+        //Permission granted
+        if (!isNaN(+roomNum) && roomNum !== "") {
+          const deviceRef = doc(db, "devices", roomNum.toString());
+          //valid input (is number)
+          getDoc(deviceRef).then((deviceSnap) => {
+            if (deviceSnap.exists()) {
+              //Check if already added the device
+              const oldlen = devices.length;
+              const newlen = devices.filter((device) => {
+                return device[1] !== roomNum;
+              }).length;
+
+              if (newlen === oldlen) {
+                setAddingDevice(false);
+                //array of devices which is stored in array of size 2
+                //device[0] represents deviceName and device[1] represents roomNum
+                setDevices([
+                  ...devices,
+                  [deviceSnap.data().deviceName, roomNum],
+                ]);
+              } else {
+                console.log("Already added this device");
+                setInvalidRoomNumber(true);
+                setHelperText("Already added this device");
+              }
+            } else {
+              //invalid input
+              console.log("Invalid Room Number");
+              setInvalidRoomNumber(true);
+              setHelperText("Invalid Room Number");
+            }
+          });
         } else {
           //invalid input
           console.log("Invalid Room Number");
           setInvalidRoomNumber(true);
           setHelperText("Invalid Room Number");
         }
-      });
-    } else {
-      //invalid input
-      console.log("Invalid Room Number");
-      setInvalidRoomNumber(true);
-      setHelperText("Invalid Room Number");
-    }
+      } else {
+        //No permission to add/view this device
+        console.log("No permission to add this device");
+        setInvalidRoomNumber(true);
+        setHelperText("No permission to add this device");
+      }
+    });
   }
 
   return (
