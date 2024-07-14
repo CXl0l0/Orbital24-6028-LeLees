@@ -15,6 +15,15 @@ import {
   Autocomplete,
   Snackbar,
   Alert,
+  Container,
+  Stack,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemButton,
+  ListSubheader,
+  Divider,
+  Typography,
 } from "@mui/material";
 import { db } from "../../../firebase/firebase";
 
@@ -51,6 +60,7 @@ const ManageDevicePage = ({ authUser }) => {
 
   //Obtain devices from database
   const initializedDevice = useRef(false);
+  const [refreshDevice, setRefreshDevice] = useState(false);
   useEffect(() => {
     if (!initializedDevice.current) {
       const deviceRef = collection(db, "devices");
@@ -61,7 +71,7 @@ const ManageDevicePage = ({ authUser }) => {
           snapshot.forEach((doc) => {
             const room = doc.id;
             console.log(room);
-            temp.push(room);
+            temp.push([room, doc.data()]);
           });
         })
         .then(() => {
@@ -71,7 +81,30 @@ const ManageDevicePage = ({ authUser }) => {
           initializedDevice.current = true;
         });
     }
-  }, []);
+  }, [refreshDevice]);
+
+  //Device List & Info logic
+  const [targetDevice, setTargetDevice] = useState(null);
+  const [targetDeviceUserAccess, setTargetDeviceUserAccess] = useState([]);
+  useEffect(() => {
+    //Set up the target device's info regarding users with access
+    if (targetDevice) {
+      console.log("Setting up");
+      const ref = collection(db, "devices", targetDevice[0], "users");
+      const q = query(ref);
+      var temp = [];
+      getDocs(q)
+        .then((snapshot) => {
+          snapshot.forEach((doc) => {
+            temp.push([doc.id, doc.data()]);
+          });
+        })
+        .then(() => {
+          console.log(temp);
+          setTargetDeviceUserAccess(temp);
+        });
+    }
+  }, [targetDevice]);
 
   //Create device logic
   const [createdDevice, setCreatedDevice] = useState(false);
@@ -106,6 +139,8 @@ const ManageDevicePage = ({ authUser }) => {
         .then(() => {
           console.log("Created device");
           setCreatedDevice(true);
+          initializedDevice.current = false;
+          setRefreshDevice(!refreshDevice);
         })
         .catch((e) => console.log(e));
     }
@@ -152,6 +187,8 @@ const ManageDevicePage = ({ authUser }) => {
         .then(() => {
           console.log("Deleted device");
           setDeletedDevice(true);
+          initializedDevice.current = false;
+          setRefreshDevice(!refreshDevice);
         })
         .catch((e) => {
           console.log(e);
@@ -172,77 +209,184 @@ const ManageDevicePage = ({ authUser }) => {
 
   return (
     <>
-      <form onSubmit={handleCreateDevice}>
-        <Box
-          sx={{ "& > :not(style)": { m: 1, width: "25ch" } }}
-          noValidate
-          autoComplete="off"
-        >
-          <TextField
-            required
-            id="create-device-name"
-            label="Enter Device Name"
-            variant="outlined"
-            onChange={(e) => setDeviceName(e.target.value)}
-            helperText={
-              deviceName.length < 20
-                ? `${deviceName.length}/20`
-                : "Max characters reached"
-            }
-            inputProps={{ maxLength: 20 }}
-          />
-          <TextField
-            required
-            id="create-device-room-number"
-            label="Enter Room Number"
-            variant="outlined"
-            onChange={(e) => setRoomNumber(e.target.value)}
-            helperText={
-              roomNumber.length < 9
-                ? `${roomNumber.length}/9`
-                : "Max characters reached"
-            }
-            inputProps={{ maxLength: 9 }}
-          />
-          <Autocomplete
-            disablePortal
-            id="create-device-pic"
-            options={authorities}
-            onChange={(event, value) => {
-              setPic(value);
+      <Stack sx={{ width: "100vw", height: "40vh" }}>
+        <Box display={"flex"}>
+          <Container
+            sx={{
+              margin: 2,
+              width: "43vw",
+              border: 1,
             }}
-            renderInput={(params) => (
-              <TextField {...params} label="Person In Charge" />
-            )}
-          />
-          <br />
-          <Button variant="contained" size="medium" type="submit">
-            Create Device
-          </Button>
-        </Box>
-      </form>
-      <form onSubmit={handleDeleteDevice}>
-        <Box
-          sx={{ "& > :not(style)": { m: 1, width: "25ch" } }}
-          noValidate
-          autoComplete="off"
-        >
-          <Autocomplete
-            disablePortal
-            id="delete-device"
-            options={devices}
-            onChange={(event, value) => {
-              setDeleteDevice(value);
+          >
+            <h1>Device List</h1>
+            <List
+              sx={{
+                width: "100%",
+                bgcolor: "background.paper",
+                position: "relative",
+                overflow: "auto",
+                height: 300,
+              }}
+              subheader={<li />}
+            >
+              <li>
+                <ul>
+                  <ListSubheader sx={{ padding: "2px" }}>Rooms:</ListSubheader>
+                  {devices.map((device) => {
+                    return (
+                      <>
+                        <ListItemButton
+                          onClick={() => {
+                            setTargetDevice(device);
+                          }}
+                          selected={targetDevice === device}
+                        >
+                          <ListItemText primary={`Room ${device[0]}`} />
+                        </ListItemButton>
+                        <Divider />
+                      </>
+                    );
+                  })}
+                </ul>
+              </li>
+            </List>
+          </Container>
+          <Container
+            sx={{
+              margin: 2,
+              marginLeft: 4,
+              width: "45vw",
+              border: 1,
             }}
-            renderInput={(params) => (
-              <TextField {...params} label="Delete A Device" />
-            )}
-          />
-          <Button variant="contained" size="medium" type="submit" color="error">
-            Delete Device
-          </Button>
+          >
+            <Typography
+              sx={{
+                borderBottom: 1,
+              }}
+            >
+              <h1>Device Info</h1>
+            </Typography>
+            <Typography>
+              <h2>Device Name: {targetDevice && targetDevice[1].deviceName}</h2>
+              <h3>Device PIC: {targetDevice && targetDevice[1].pic}</h3>
+            </Typography>
+            <List
+              sx={{
+                width: "100%",
+                bgcolor: "background.paper",
+                position: "relative",
+                overflow: "auto",
+                height: 230,
+              }}
+              subheader={<li />}
+            >
+              <li>
+                <ul>
+                  <ListSubheader sx={{ padding: "2px" }}>
+                    Users with access:
+                  </ListSubheader>
+                  {targetDeviceUserAccess.length === 0 ? (
+                    <p>None</p>
+                  ) : (
+                    targetDeviceUserAccess.map((user) => {
+                      return (
+                        <>
+                          <ListItem>{user[1].username}</ListItem>
+                          <Divider />
+                        </>
+                      );
+                    })
+                  )}
+                </ul>
+              </li>
+            </List>
+          </Container>
         </Box>
-      </form>
+      </Stack>
+      <Stack>
+        <Box display={"flex"}>
+          <Container
+            sx={{ "& > :not(style)": { m: 1, width: "25ch" } }}
+            noValidate
+            autoComplete="off"
+          >
+            <form onSubmit={handleCreateDevice}>
+              <TextField
+                required
+                sx={{ width: "40vw" }}
+                id="create-device-name"
+                label="Enter Device Name"
+                variant="outlined"
+                onChange={(e) => setDeviceName(e.target.value)}
+                helperText={
+                  deviceName.length < 20
+                    ? `${deviceName.length}/20`
+                    : "Max characters reached"
+                }
+                inputProps={{ maxLength: 20 }}
+              />
+              <TextField
+                required
+                id="create-device-room-number"
+                label="Enter Room Number"
+                variant="outlined"
+                onChange={(e) => setRoomNumber(e.target.value)}
+                helperText={
+                  roomNumber.length < 9
+                    ? `${roomNumber.length}/9`
+                    : "Max characters reached"
+                }
+                inputProps={{ maxLength: 9 }}
+              />
+              <Autocomplete
+                disablePortal
+                id="create-device-pic"
+                options={authorities}
+                onChange={(event, value) => {
+                  setPic(value);
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Person In Charge" />
+                )}
+              />
+              <br />
+              <Button variant="contained" size="medium" type="submit">
+                Create Device
+              </Button>
+            </form>
+          </Container>
+          <Container
+            sx={{ "& > :not(style)": { m: 1, width: "25ch" } }}
+            noValidate
+            autoComplete="off"
+          >
+            <form onSubmit={handleDeleteDevice}>
+              <Autocomplete
+                disablePortal
+                id="delete-device"
+                options={devices.map((device) => {
+                  return device[0];
+                })}
+                onChange={(event, value) => {
+                  setDeleteDevice(value);
+                }}
+                renderInput={(params) => (
+                  <TextField {...params} label="Delete A Device" />
+                )}
+              />
+              <br />
+              <Button
+                variant="contained"
+                size="medium"
+                type="submit"
+                color="error"
+              >
+                Delete Device
+              </Button>
+            </form>
+          </Container>
+        </Box>
+      </Stack>
       {
         //Snackbars
         <>

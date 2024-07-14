@@ -60,9 +60,16 @@ const EditUserInterface = ({
   function addAccess() {
     console.log("Adding access");
     const uid = targetUser[0];
+    //Modify user access file
     setDoc(doc(db, "accounts", uid, "access", targetRoom), {
       dummy: "field",
     })
+      .then(() => {
+        //Modify device's users file
+        setDoc(doc(db, "devices", targetRoom, "users", targetUser[0]), {
+          username: targetUser[1].username,
+        });
+      })
       .then(() => {
         console.log("Done adding access to user " + targetUser[1].username);
         setTargetRoom(null);
@@ -81,15 +88,19 @@ const EditUserInterface = ({
   function removeAccess() {
     console.log("Removing access of " + removalTarget);
     const uid = targetUser[0];
-    deleteDoc(doc(db, "accounts", uid, "access", removalTarget))
-      .then(() => {
-        console.log("Done removing access of " + removalTarget);
-        setRemovalTarget(null);
-      })
-      .then(() => {
-        refreshUserAccess();
-        setRemovedAccess(true);
-      });
+    //Delete doc from user
+    deleteDoc(doc(db, "accounts", uid, "access", removalTarget)).then(() => {
+      //Delete doc from device
+      deleteDoc(doc(db, "devices", removalTarget, "users", uid))
+        .then(() => {
+          console.log("Done removing access of " + removalTarget);
+          setRemovalTarget(null);
+        })
+        .then(() => {
+          refreshUserAccess();
+          setRemovedAccess(true);
+        });
+    });
   }
 
   //Close snackbar function
