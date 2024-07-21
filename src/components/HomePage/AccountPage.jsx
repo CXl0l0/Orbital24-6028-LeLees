@@ -3,7 +3,16 @@ import { IoIosUndo } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { IconButton } from "@mui/material";
 import { auth, db } from "../../firebase/firebase";
-import { doc, getDoc, deleteDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  getDocs,
+  deleteDoc,
+  setDoc,
+  collection,
+  query,
+  where,
+} from "firebase/firestore";
 import { socket } from "../../socket";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -46,6 +55,26 @@ const AccountPage = (prop) => {
         //Remove data in Firestore and disconnect socket
         console.log("Successfully deleted account");
         deleteDoc(doc(db, "accounts", authUser.uid));
+        //Deletes data of the user's access to devices
+        const roomRef = collection(db, "devices");
+        getDocs(roomRef).then((roomSnapshot) => {
+          roomSnapshot.forEach((room) => {
+            deleteDoc(doc(db, "devices", room.id, "users", authUser.uid));
+          });
+        });
+        //Deletes data of the user's report
+        const reportRef = collection(db, "report", "user", authUser.uid);
+        getDocs(reportRef).then((reportSnapshot) => {
+          reportSnapshot.forEach((report) => {
+            const picRef = doc(db, "devices", report.id);
+            getDoc(picRef).then((picSnap) => {
+              const pic = picSnap.data().pic;
+              deleteDoc(doc(db, "report", "admin", pic, report.id));
+            });
+            deleteDoc(doc(db, "report", "user", authUser.uid, report.id));
+          });
+        });
+        //Disconnect socket
         socket.disconnect();
       })
       .then(() => {

@@ -310,6 +310,7 @@ const ManageDevicePage = ({ authUser }) => {
             noValidate
             autoComplete="off"
           >
+            <h1>Create Device</h1>
             <form onSubmit={handleCreateDevice}>
               <TextField
                 required
@@ -360,6 +361,7 @@ const ManageDevicePage = ({ authUser }) => {
             noValidate
             autoComplete="off"
           >
+            <h1>Delete Device</h1>
             <form onSubmit={handleDeleteDevice}>
               <Autocomplete
                 disablePortal
