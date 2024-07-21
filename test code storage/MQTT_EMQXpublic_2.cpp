@@ -13,8 +13,8 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
-const char wifi_ssid[] = "me";
-const char wifi_password[] = "tofu11122004";
+const char wifi_ssid[] = "leepoomeng";
+const char wifi_password[] = "0192348678";
 const char EMQX_endpoint[] = "broker.emqx.io";
 const char publish_topic[] = "urusai1234";
 const char subscribe_topic[] = "urusai12345";
