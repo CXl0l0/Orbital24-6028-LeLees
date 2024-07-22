@@ -218,7 +218,13 @@ const ManageDevicePage = ({ authUser }) => {
               border: 1,
             }}
           >
-            <h1>Device List</h1>
+            <Typography
+              sx={{
+                borderBottom: 1,
+              }}
+            >
+              <h1>Device List</h1>
+            </Typography>
             <List
               sx={{
                 width: "100%",

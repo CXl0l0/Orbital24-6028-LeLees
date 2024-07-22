@@ -1,28 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { IoIosUndo } from "react-icons/io";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useNavigate } from "react-router-dom";
-import { IconButton } from "@mui/material";
 import { auth, db } from "../../firebase/firebase";
 import {
   doc,
   getDoc,
   getDocs,
   deleteDoc,
-  setDoc,
   collection,
-  query,
-  where,
 } from "firebase/firestore";
+import {
+  Box,
+  Divider,
+  Toolbar,
+  Typography,
+  Button,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Dialog,
+  IconButton,
+  Container,
+  LinearProgress,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { socket } from "../../socket";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 
 const AccountPage = (prop) => {
   //For navigating to other pages
@@ -31,20 +37,25 @@ const AccountPage = (prop) => {
   const [userDoc, setUserDoc] = useState(null);
   const [role, setRole] = useState("");
   const [id, setID] = useState("");
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     console.log("Reading firestore");
     const userRef = doc(db, "accounts", authUser.uid);
-    getDoc(userRef).then((userSnap) => {
-      if (userSnap.exists()) {
-        const userData = userSnap.data();
-        setUserDoc(userData);
-        setRole(userData.role);
-        setID(userData.id);
-      } else {
-        console.log("User doesnt exist in database");
-      }
-    });
+    getDoc(userRef)
+      .then((userSnap) => {
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          setUserDoc(userData);
+          setRole(userData.role);
+          setID(userData.id);
+        } else {
+          console.log("User doesnt exist in database");
+        }
+      })
+      .then(() => {
+        setLoaded(true);
+      });
   }, []);
 
   const [deletingAccount, setDeletingAccount] = useState(false);
@@ -83,11 +94,36 @@ const AccountPage = (prop) => {
       });
   }
 
+  //Style copied from MUI Material Divider section
+  const Root = styled("div")(({ theme }) => ({
+    width: "100%",
+    ...theme.typography.body2,
+    color: theme.palette.text.secondary,
+    "& > :not(style) ~ :not(style)": {
+      marginTop: theme.spacing(2),
+    },
+  }));
+
+  //Copy to clipboard snackbar
+  const [copiedUID, setCopiedUID] = useState(false);
+  function handleCloseSnackBar(event, reason) {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setCopiedUID(false);
+  }
+
   return (
     <>
       <Box>
         <Toolbar>
-          <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            textAlign="center"
+            variant="h4"
+            component="div"
+            sx={{ flexGrow: 1, paddingLeft: 7 }}
+          >
             Account Details
           </Typography>
           <IconButton aria-label="backToHomePage" onClick={prop.goBack}>
@@ -95,42 +131,99 @@ const AccountPage = (prop) => {
           </IconButton>
         </Toolbar>
       </Box>
-
-      <div className="account-overview">
-        Username: {authUser.displayName}
-        <br />
-        Email: {authUser.email}
-        <br />
-        Access Role: {role}
-        <br />
-        {role === "administration" && <div>ID: {id}</div>}
-      </div>
-      <Button
-        variant="contained"
-        color="error"
-        onClick={() => setDeletingAccount(true)}
-      >
-        Delete Account
-      </Button>
+      <Box className="account-overview" display={"flex"}>
+        {!loaded ? (
+          <>
+            <br />
+            <LinearProgress />
+          </>
+        ) : (
+          <>
+            <Container>
+              <Root>
+                <Divider textAlign="center">Username</Divider>
+                <Typography variant="h6" textAlign="center">
+                  {authUser.displayName}
+                </Typography>
+                <Divider textAlign="center">UID</Divider>
+                <Typography variant="h6" textAlign="center">
+                  {authUser.uid}
+                  <IconButton
+                    onClick={() => {
+                      setCopiedUID(true);
+                      navigator.clipboard.writeText(authUser.uid);
+                    }}
+                    sx={{ translate: 10 }}
+                    size="small"
+                  >
+                    <ContentCopyIcon fontSize="small" />
+                  </IconButton>
+                </Typography>
+                <Divider textAlign="center">Access Role</Divider>
+                <Typography variant="h6" textAlign="center">
+                  {role}
+                </Typography>
+                <Divider textAlign="center">Email</Divider>
+                <Typography variant="h6" textAlign="center">
+                  {authUser.email}
+                </Typography>
+                {role === "administration" && (
+                  <>
+                    <Divider textAlign="center">Administration ID</Divider>
+                    <Typography variant="h6" textAlign="center">
+                      {id}
+                    </Typography>
+                  </>
+                )}
+              </Root>
+              <Typography textAlign="center" sx={{ marginTop: 3 }}>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => setDeletingAccount(true)}
+                >
+                  Delete Account
+                </Button>
+              </Typography>
+            </Container>
+          </>
+        )}
+      </Box>
       {
-        //Delete account dialog
-        <Dialog
-          open={deletingAccount}
-          onClose={() => setDeletingAccount(false)}
-          aria-labelledby="delete-device-title"
-          aria-describedby="delete-device-description"
-        >
-          <DialogTitle>Deleting Account</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              You are about to delete your account permanently, are you sure?
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setDeletingAccount(false)}>Back</Button>
-            <Button onClick={handleDeleteAccount}>Confirm</Button>
-          </DialogActions>
-        </Dialog>
+        //Delete account dialog and Snackbar for copied UID
+        <>
+          <Dialog
+            open={deletingAccount}
+            onClose={() => setDeletingAccount(false)}
+            aria-labelledby="delete-device-title"
+            aria-describedby="delete-device-description"
+          >
+            <DialogTitle>Deleting Account</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                You are about to delete your account permanently, are you sure?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setDeletingAccount(false)}>Back</Button>
+              <Button onClick={handleDeleteAccount}>Confirm</Button>
+            </DialogActions>
+          </Dialog>
+          <Snackbar //Copied UID to clipboard
+            open={copiedUID}
+            autoHideDuration={2000}
+            onClose={handleCloseSnackBar}
+          >
+            <Alert
+              onClose={handleCloseSnackBar}
+              severity="success"
+              variant="filled"
+              sx={{ width: "100%" }}
+            >
+              Copied UID to clipboard.
+            </Alert>
+          </Snackbar>
+        </>
       }
     </>
   );
