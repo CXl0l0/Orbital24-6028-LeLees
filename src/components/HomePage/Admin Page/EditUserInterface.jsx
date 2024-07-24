@@ -54,6 +54,11 @@ const EditUserInterface = ({
 
   //Add access logic
   const [targetRoom, setTargetRoom] = useState(null);
+  const [resetInputField, setResetInputField] = useState(false);
+  useEffect(() => {
+    setResetInputField(!resetInputField);
+  }, [targetUser]);
+
   //Snackbar
   const [addedAccess, setAddedAccess] = useState(false);
 
@@ -76,6 +81,7 @@ const EditUserInterface = ({
       })
       .then(() => {
         refreshUserAccess();
+        setResetInputField(!resetInputField);
         setAddedAccess(true);
       });
   }
@@ -219,6 +225,7 @@ const EditUserInterface = ({
           {targetUser && (
             <>
               <Autocomplete
+                key={resetInputField}
                 disablePortal
                 id="add-access"
                 options={devicesInfo

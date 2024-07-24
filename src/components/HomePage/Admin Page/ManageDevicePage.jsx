@@ -108,6 +108,9 @@ const ManageDevicePage = ({ authUser }) => {
 
   //Create device logic
   const [createdDevice, setCreatedDevice] = useState(false);
+  const [resetCreateDeviceInputField, setResetCreateDeviceInputField] =
+    useState(false);
+
   function handleCloseSuccessSnackbar(event, reason) {
     if (reason === "clickaway") {
       return;
@@ -141,6 +144,9 @@ const ManageDevicePage = ({ authUser }) => {
           setCreatedDevice(true);
           initializedDevice.current = false;
           setRefreshDevice(!refreshDevice);
+          setDeviceName("");
+          setRoomNumber("");
+          setResetCreateDeviceInputField(!resetCreateDeviceInputField);
         })
         .catch((e) => console.log(e));
     }
@@ -150,6 +156,8 @@ const ManageDevicePage = ({ authUser }) => {
   //Delete device logic
   const [deleteDevice, setDeleteDevice] = useState(null);
   const [deletedDevice, setDeletedDevice] = useState(false);
+  const [resetDeleteDeviceInputField, setResetDeleteDeviceInputField] =
+    useState(false);
   function handleCloseDeletedDeviceSnackbar(event, reason) {
     if (reason === "clickaway") {
       return;
@@ -188,6 +196,7 @@ const ManageDevicePage = ({ authUser }) => {
           console.log("Deleted device");
           setDeletedDevice(true);
           initializedDevice.current = false;
+          setResetDeleteDeviceInputField(!resetDeleteDeviceInputField);
           setRefreshDevice(!refreshDevice);
         })
         .catch((e) => {
@@ -309,6 +318,7 @@ const ManageDevicePage = ({ authUser }) => {
           </Container>
         </Box>
       </Stack>
+      <Divider />
       <Stack>
         <Box display={"flex"}>
           <Container
@@ -324,6 +334,7 @@ const ManageDevicePage = ({ authUser }) => {
                 id="create-device-name"
                 label="Enter Device Name"
                 variant="outlined"
+                value={deviceName}
                 onChange={(e) => setDeviceName(e.target.value)}
                 helperText={
                   deviceName.length < 20
@@ -337,6 +348,7 @@ const ManageDevicePage = ({ authUser }) => {
                 id="create-device-room-number"
                 label="Enter Room Number"
                 variant="outlined"
+                value={roomNumber}
                 onChange={(e) => setRoomNumber(e.target.value)}
                 helperText={
                   roomNumber.length < 9
@@ -346,6 +358,7 @@ const ManageDevicePage = ({ authUser }) => {
                 inputProps={{ maxLength: 9 }}
               />
               <Autocomplete
+                key={resetCreateDeviceInputField}
                 disablePortal
                 id="create-device-pic"
                 options={authorities}
@@ -370,6 +383,7 @@ const ManageDevicePage = ({ authUser }) => {
             <h1>Delete Device</h1>
             <form onSubmit={handleDeleteDevice}>
               <Autocomplete
+                key={resetDeleteDeviceInputField}
                 disablePortal
                 id="delete-device"
                 options={devices.map((device) => {
@@ -447,11 +461,11 @@ const ManageDevicePage = ({ authUser }) => {
           >
             <Alert
               onClose={handleCloseDeletedDeviceSnackbar}
-              severity="success"
+              severity="error"
               variant="filled"
               sx={{ width: "100%" }}
             >
-              Successfully deleted device.
+              Deleted device.
             </Alert>
           </Snackbar>
           <Snackbar //Successfully created device
