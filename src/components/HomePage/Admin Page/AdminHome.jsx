@@ -4,7 +4,7 @@ import { signOut, onAuthStateChanged } from "firebase/auth";
 import { socket } from "../../../socket";
 import { auth, db } from "../../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { IconButton } from "@mui/material";
+import { Container, IconButton } from "@mui/material";
 import { IoLogInOutline } from "react-icons/io5";
 import { MdAccountCircle } from "react-icons/md";
 import { IoMdSettings } from "react-icons/io";
@@ -149,6 +149,7 @@ export const AdminHome = () => {
                 sx={{
                   fontFamily: "revert",
                   fontWeight: 600,
+                  maxWidth: 250,
                   flexGrow: 1,
                   color: "inherit",
                   textDecoration: "none",
@@ -156,17 +157,28 @@ export const AdminHome = () => {
               >
                 urusai! Admin Home Page
               </Typography>
-              <Tooltip title="Notification">
+              <Typography
+                sx={{
+                  fontFamily: "revert",
+                  fontWeight: 600,
+                  maxWidth: 2000,
+                  flexGrow: 1,
+                  color: "inherit",
+                  textDecoration: "none",
+                }}
+              ></Typography>
+              {/* Disabled temporarily
+                <Tooltip title="Notification">
                 <IconButton
                   aria-label="notification"
                   onClick={() => setOverlayPage("Notification")}
-                >
+                  >
                   <Badge
                     badgeContent={notifications.length}
                     max={9}
                     overlap="circular"
                     color="error"
-                  >
+                    >
                     <IoIosNotifications size={30} />
                   </Badge>
                 </IconButton>
@@ -179,6 +191,7 @@ export const AdminHome = () => {
                   <IoMdSettings size={30} />
                 </IconButton>
               </Tooltip>
+                */}
               <Tooltip title="Account">
                 <IconButton
                   aria-label="account"

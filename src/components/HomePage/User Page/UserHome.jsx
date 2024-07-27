@@ -133,6 +133,7 @@ const UserHome = () => {
                 sx={{
                   fontFamily: "revert",
                   fontWeight: 600,
+                  maxWidth: 230,
                   flexGrow: 1,
                   color: "inherit",
                   textDecoration: "none",
@@ -140,17 +141,28 @@ const UserHome = () => {
               >
                 urusai! User Home Page
               </Typography>
-              <Tooltip title="Notification">
+              <Typography
+                sx={{
+                  fontFamily: "revert",
+                  fontWeight: 600,
+                  maxWidth: 2020,
+                  flexGrow: 1,
+                  color: "inherit",
+                  textDecoration: "none",
+                }}
+              ></Typography>
+              {/* Disabled temporarily
+                <Tooltip title="Notification">
                 <IconButton
                   aria-label="notification"
                   onClick={() => setOverlayPage("Notification")}
-                >
+                  >
                   <Badge
                     badgeContent={notifications.length}
                     max={9}
                     overlap="circular"
                     color="error"
-                  >
+                    >
                     <IoIosNotifications size={30} />
                   </Badge>
                 </IconButton>
@@ -163,6 +175,7 @@ const UserHome = () => {
                   <IoMdSettings size={30} />
                 </IconButton>
               </Tooltip>
+                */}
               <Tooltip title="Account">
                 <IconButton
                   aria-label="account"

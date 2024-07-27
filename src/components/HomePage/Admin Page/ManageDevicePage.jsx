@@ -193,6 +193,17 @@ const ManageDevicePage = ({ authUser }) => {
           );
         })
         .then(() => {
+          //Delete device's access from accounts
+          const accountRef = collection(db, "accounts");
+          getDocs(accountRef).then((accountsSnap) => {
+            accountsSnap.forEach((account) => {
+              deleteDoc(
+                doc(db, "accounts", account.id, "access", deleteDevice)
+              );
+            });
+          });
+        })
+        .then(() => {
           console.log("Deleted device");
           setDeletedDevice(true);
           initializedDevice.current = false;
