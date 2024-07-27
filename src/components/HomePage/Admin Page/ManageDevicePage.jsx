@@ -204,6 +204,20 @@ const ManageDevicePage = ({ authUser }) => {
           });
         })
         .then(() => {
+          //Delete subcollection
+          const usersAccessRef = collection(
+            db,
+            "devices",
+            deleteDevice,
+            "users"
+          );
+          getDocs(usersAccessRef).then((accessSnap) => {
+            accessSnap.forEach((user) => {
+              deleteDoc(doc(db, "devices", deleteDevice, "users", user.id));
+            });
+          });
+        })
+        .then(() => {
           console.log("Deleted device");
           setDeletedDevice(true);
           initializedDevice.current = false;

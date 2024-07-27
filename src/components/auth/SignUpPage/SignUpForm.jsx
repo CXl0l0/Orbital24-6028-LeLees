@@ -138,6 +138,14 @@ const SignUpForm = () => {
     });
   };
 
+  function preventSpace(e) {
+    //Turns input of space into underscore ("_")
+    if (e.target.value[e.target.value.length - 1] === " ") {
+      console.log("Space found");
+      setUserName(e.target.value.slice(0, e.target.value.length - 1) + "_");
+    }
+  }
+
   return sendEmailVerificationLetter ? (
     <p className="emailLetter">
       We've sent you an email verification! Please check your email to verify
@@ -160,7 +168,10 @@ const SignUpForm = () => {
                 type="text"
                 placeholder="Enter Your Username"
                 value={userName}
-                onChange={(e) => setUserName(e.target.value)}
+                onChange={(e) => {
+                  setUserName(e.target.value);
+                  preventSpace(e);
+                }}
                 required
               />
               <br />
