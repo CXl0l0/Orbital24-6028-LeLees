@@ -206,7 +206,7 @@ const EditUserInterface = ({
             //Snackbar for remove access
             <Snackbar
               open={removedAccess}
-              autoHideDuration={4000}
+              autoHideDuration={2000}
               onClose={handleCloseSnackbar}
             >
               <Alert
@@ -281,7 +281,7 @@ const EditUserInterface = ({
                 //Snackbar for add access
                 <Snackbar
                   open={addedAccess}
-                  autoHideDuration={4000}
+                  autoHideDuration={2000}
                   onClose={handleCloseSnackbar}
                 >
                   <Alert

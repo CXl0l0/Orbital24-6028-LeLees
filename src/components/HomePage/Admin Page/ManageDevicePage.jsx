@@ -219,6 +219,9 @@ const ManageDevicePage = ({ authUser }) => {
         })
         .then(() => {
           console.log("Deleted device");
+          if (targetDevice[0] === deleteDevice) {
+            setTargetDevice(null);
+          }
           setDeletedDevice(true);
           initializedDevice.current = false;
           setResetDeleteDeviceInputField(!resetDeleteDeviceInputField);
