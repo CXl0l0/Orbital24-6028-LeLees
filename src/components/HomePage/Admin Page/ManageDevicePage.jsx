@@ -230,7 +230,7 @@ const ManageDevicePage = ({ authUser }) => {
         })
         .then(() => {
           console.log("Deleted device");
-          if (targetDevice[0] === deleteDevice) {
+          if (targetDevice && targetDevice[0] === deleteDevice) {
             setTargetDevice(null);
           }
           setDeletedDevice(true);
