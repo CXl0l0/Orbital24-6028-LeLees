@@ -4,6 +4,7 @@ import {
   query,
   where,
   getDocs,
+  getDoc,
   setDoc,
   doc,
   deleteDoc,
@@ -123,33 +124,43 @@ const ManageDevicePage = ({ authUser }) => {
     e.preventDefault();
     console.log("Checking input validity...");
     setError(null);
-    const re = /^[0-9\b]+$/; //Test room number validity
-    if (!re.test(roomNumber)) {
-      //User entered an invalid room number
-      console.log("Please enter a valid room number");
-      setError("Room Number");
-    } else if (pic === null) {
-      //User didn't select a pic
-      console.log("Please select a pic");
-      setError("pic");
-    } else {
-      //All valid, proceeds to create device
-      console.log("Creating device...");
-      setDoc(doc(db, "devices", roomNumber), {
-        deviceName: deviceName,
-        pic: pic,
-      })
-        .then(() => {
-          console.log("Created device");
-          setCreatedDevice(true);
-          initializedDevice.current = false;
-          setRefreshDevice(!refreshDevice);
-          setDeviceName("");
-          setRoomNumber("");
-          setResetCreateDeviceInputField(!resetCreateDeviceInputField);
-        })
-        .catch((e) => console.log(e));
-    }
+    const deviceRef = doc(db, "devices", roomNumber);
+    getDoc(deviceRef).then((snapshot) => {
+      if (!snapshot.exists()) {
+        //Device never added before
+        const re = /^[0-9\b]+$/; //Test room number validity
+        if (!re.test(roomNumber)) {
+          //User entered an invalid room number
+          console.log("Please enter a valid room number");
+          setError("Room Number");
+        } else if (pic === null) {
+          //User didn't select a pic
+          console.log("Please select a pic");
+          setError("pic");
+        } else {
+          //All valid, proceeds to create device
+          console.log("Creating device...");
+          setDoc(doc(db, "devices", roomNumber), {
+            deviceName: deviceName,
+            pic: pic,
+          })
+            .then(() => {
+              console.log("Created device");
+              setCreatedDevice(true);
+              initializedDevice.current = false;
+              setRefreshDevice(!refreshDevice);
+              setDeviceName("");
+              setRoomNumber("");
+              setResetCreateDeviceInputField(!resetCreateDeviceInputField);
+            })
+            .catch((e) => console.log(e));
+        }
+      } else {
+        //Device already exists
+        console.log("Device already exists");
+        setError("Duplicate Device");
+      }
+    });
   }
   //End of create device logic
 
@@ -358,7 +369,7 @@ const ManageDevicePage = ({ authUser }) => {
             <form onSubmit={handleCreateDevice}>
               <TextField
                 required
-                sx={{ width: "40vw" }}
+                sx={{ width: "40vw", marginBottom: 2, marginTop: 1 }}
                 id="create-device-name"
                 label="Enter Device Name"
                 variant="outlined"
@@ -373,6 +384,7 @@ const ManageDevicePage = ({ authUser }) => {
               />
               <TextField
                 required
+                sx={{ marginBottom: 2 }}
                 id="create-device-room-number"
                 label="Enter Room Number"
                 variant="outlined"
@@ -387,6 +399,7 @@ const ManageDevicePage = ({ authUser }) => {
               />
               <Autocomplete
                 key={resetCreateDeviceInputField}
+                sx={{ marginBottom: 2 }}
                 disablePortal
                 id="create-device-pic"
                 options={authorities}
@@ -397,7 +410,6 @@ const ManageDevicePage = ({ authUser }) => {
                   <TextField {...params} label="Person In Charge" />
                 )}
               />
-              <br />
               <Button variant="contained" size="medium" type="submit">
                 Create Device
               </Button>
@@ -480,6 +492,20 @@ const ManageDevicePage = ({ authUser }) => {
               sx={{ width: "100%" }}
             >
               Please select a device to be deleted.
+            </Alert>
+          </Snackbar>
+          <Snackbar //Duplicate device
+            autoHideDuration={4000}
+            onClose={handleCloseSnackBar}
+            open={error === "Duplicate Device"}
+          >
+            <Alert
+              onClose={handleCloseSnackBar}
+              severity="error"
+              variant="filled"
+              sx={{ width: "100%" }}
+            >
+              This device already exists.
             </Alert>
           </Snackbar>
           <Snackbar //Successfully deleted device
