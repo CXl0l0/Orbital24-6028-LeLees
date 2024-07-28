@@ -151,6 +151,7 @@ const ManageDevicePage = ({ authUser }) => {
               setRefreshDevice(!refreshDevice);
               setDeviceName("");
               setRoomNumber("");
+              setPic(null);
               setResetCreateDeviceInputField(!resetCreateDeviceInputField);
             })
             .catch((e) => console.log(e));
@@ -237,6 +238,7 @@ const ManageDevicePage = ({ authUser }) => {
           initializedDevice.current = false;
           setResetDeleteDeviceInputField(!resetDeleteDeviceInputField);
           setRefreshDevice(!refreshDevice);
+          setDeleteDevice(null);
         })
         .catch((e) => {
           console.log(e);
