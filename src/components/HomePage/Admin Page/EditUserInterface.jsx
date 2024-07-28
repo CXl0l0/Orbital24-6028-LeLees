@@ -132,6 +132,7 @@ const EditUserInterface = ({
           <h1>Edit User Access</h1>
           <h2>Target User: {targetUser && targetUser[1]?.username}</h2>
           <h3>User UID: {targetUser && targetUser[0]}</h3>
+          <h4>Email: {targetUser && targetUser[1]?.email}</h4>
         </Container>
         <Container
           sx={{
