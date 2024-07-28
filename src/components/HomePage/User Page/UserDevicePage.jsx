@@ -122,14 +122,15 @@ const UserDevicePage = ({ authUser }) => {
       roomNum.toString()
     );
 
-    getDoc(permissionRef).then((snapshot) => {
-      if (snapshot.exists()) {
-        //Permission granted
-        if (!isNaN(+roomNum) && roomNum !== "") {
-          const deviceRef = doc(db, "devices", roomNum.toString());
-          //valid input (is number)
-          getDoc(deviceRef).then((deviceSnap) => {
-            if (deviceSnap.exists()) {
+    if (!isNaN(+roomNum) && roomNum !== "") {
+      //valid input (is number)
+      const deviceRef = doc(db, "devices", roomNum.toString());
+      getDoc(deviceRef).then((deviceSnap) => {
+        if (deviceSnap.exists()) {
+          //device exists
+          getDoc(permissionRef).then((snapshot) => {
+            if (snapshot.exists()) {
+              //Permission granted
               //Check if already added the device
               const oldlen = devices.length;
               const newlen = devices.filter((device) => {
@@ -150,10 +151,10 @@ const UserDevicePage = ({ authUser }) => {
                 setHelperText("Already added this device");
               }
             } else {
-              //invalid input
-              console.log("Invalid Room Number");
+              //No permission to add/view this device
+              console.log("No permission to add this device");
               setInvalidRoomNumber(true);
-              setHelperText("Invalid Room Number");
+              setHelperText("No permission to add this device");
             }
           });
         } else {
@@ -162,13 +163,13 @@ const UserDevicePage = ({ authUser }) => {
           setInvalidRoomNumber(true);
           setHelperText("Invalid Room Number");
         }
-      } else {
-        //No permission to add/view this device
-        console.log("No permission to add this device");
-        setInvalidRoomNumber(true);
-        setHelperText("No permission to add this device");
-      }
-    });
+      });
+    } else {
+      //invalid input
+      console.log("Invalid Room Number");
+      setInvalidRoomNumber(true);
+      setHelperText("Invalid Room Number");
+    }
   }
 
   return (
