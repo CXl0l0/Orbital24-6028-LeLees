@@ -124,20 +124,20 @@ const ManageDevicePage = ({ authUser }) => {
     e.preventDefault();
     console.log("Checking input validity...");
     setError(null);
-    const deviceRef = doc(db, "devices", roomNumber);
-    getDoc(deviceRef).then((snapshot) => {
-      if (!snapshot.exists()) {
-        //Device never added before
-        const re = /^[0-9\b]+$/; //Test room number validity
-        if (!re.test(roomNumber)) {
-          //User entered an invalid room number
-          console.log("Please enter a valid room number");
-          setError("Room Number");
-        } else if (pic === null) {
-          //User didn't select a pic
-          console.log("Please select a pic");
-          setError("pic");
-        } else {
+    //Device never added before
+    const re = /^[0-9\b]+$/; //Test room number validity
+    if (!re.test(roomNumber)) {
+      //User entered an invalid room number
+      console.log("Please enter a valid room number");
+      setError("Room Number");
+    } else if (pic === null) {
+      //User didn't select a pic
+      console.log("Please select a pic");
+      setError("pic");
+    } else {
+      const deviceRef = doc(db, "devices", roomNumber);
+      getDoc(deviceRef).then((snapshot) => {
+        if (!snapshot.exists()) {
           //All valid, proceeds to create device
           console.log("Creating device...");
           setDoc(doc(db, "devices", roomNumber), {
@@ -154,13 +154,13 @@ const ManageDevicePage = ({ authUser }) => {
               setResetCreateDeviceInputField(!resetCreateDeviceInputField);
             })
             .catch((e) => console.log(e));
+        } else {
+          //Device already exists
+          console.log("Device already exists");
+          setError("Duplicate Device");
         }
-      } else {
-        //Device already exists
-        console.log("Device already exists");
-        setError("Duplicate Device");
-      }
-    });
+      });
+    }
   }
   //End of create device logic
 
