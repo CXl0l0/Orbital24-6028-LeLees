@@ -4,12 +4,10 @@ import { signOut, onAuthStateChanged } from "firebase/auth";
 import { socket } from "../../../socket";
 import { auth, db } from "../../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { Container, IconButton } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { IoLogInOutline } from "react-icons/io5";
 import { MdAccountCircle } from "react-icons/md";
-import { IoMdSettings } from "react-icons/io";
 import { useNavigate, Navigate } from "react-router-dom";
-import { IoIosNotifications } from "react-icons/io";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -27,7 +25,6 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CircularProgress from "@mui/material/CircularProgress";
 import Tooltip from "@mui/material/Tooltip";
-import Badge from "@mui/material/Badge";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
@@ -167,31 +164,6 @@ export const AdminHome = () => {
                   textDecoration: "none",
                 }}
               ></Typography>
-              {/* Disabled temporarily
-                <Tooltip title="Notification">
-                <IconButton
-                  aria-label="notification"
-                  onClick={() => setOverlayPage("Notification")}
-                  >
-                  <Badge
-                    badgeContent={notifications.length}
-                    max={9}
-                    overlap="circular"
-                    color="error"
-                    >
-                    <IoIosNotifications size={30} />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Settings">
-                <IconButton
-                  aria-label="settings"
-                  onClick={() => setOverlayPage("Settings")}
-                >
-                  <IoMdSettings size={30} />
-                </IconButton>
-              </Tooltip>
-                */}
               <Tooltip title="Account">
                 <IconButton
                   aria-label="account"

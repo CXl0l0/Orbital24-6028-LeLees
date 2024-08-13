@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+//This component is scrapped from final product
 import { IoIosUndo } from "react-icons/io";
 import { IconButton } from "@mui/material";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { socket } from "../../socket";
 
 const NotificationPage = ({ notifications, goBack }) => {
   return (

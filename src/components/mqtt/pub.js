@@ -1,10 +1,9 @@
 const mqtt = require("mqtt");
 var client = mqtt.connect("wss://broker.emqx.io:8084/mqtt");
-//var client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
 
 client.on("connect", function () {
   setInterval(() => {
-    var random = Math.round(Math.random() * 4096);
+    var random = Math.round(Math.random() * (4096 - 1700) + 1700);
     const jsonData = {
       "Sound value": random,
     };

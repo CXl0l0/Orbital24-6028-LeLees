@@ -1,4 +1,4 @@
-//Copied from Material UI Table component under "Custom paginatio actions"
+//Taken from Material UI Table component under "Custom pagination actions"
 
 import * as React from "react";
 import { useTheme } from "@mui/material/styles";
